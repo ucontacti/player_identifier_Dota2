@@ -1,4 +1,4 @@
-package dota2identifier.click;
+package dota2identifier.item_change;
 
 
 import com.google.protobuf.GeneratedMessage;
@@ -85,62 +85,8 @@ public class Main {
         }     
     }
 
-
     @UsesEntities
     @UsesStringTable("EntityNames")
-    @OnTickStart
-    public void OnTickEnd(Context ctx, boolean synthetic) {
-        tick = ctx.getTick();
-        Entities entities = ctx.getProcessor(Entities.class);
-        StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
-        int itemId;
-
-        for (Entity et: ent_list)
-        {
-            // if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
-            // {
-            //     log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-            // }
-            if(et.getDtClass().getDtName().equals("CDOTAPlayer"))
-            {
-                if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
-                {
-                    // log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                    // log.info("tick {}, entity {}: {} {}", tick, et.getProperty("m_iPlayerID"), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(tick);
-                    sb.append(',');
-                    sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                    sb.append(',');
-                    sb.append(et.getProperty("m_iCursor.0000"));
-                    sb.append(',');
-                    sb.append(et.getProperty("m_iCursor.0001"));
-                    sb.append('\n');
-                    mouse_writer.write(sb.toString());
-                }
-            }
-            else if (isHero(et))
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.append(tick);
-                sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                for (int i=0; i<9; i++)
-                {
-                    String item_slot = String.format("m_hItems.%04d", i);
-                    int item_id = et.getProperty(item_slot);
-                    String item_name = getEntityNameByHandle(item_id, entities, stringTable);
-                    sb.append(',');
-                    // sb.append(item_name);
-                    sb.append(item_id);
-                }
-                // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
-                sb.append('\n');
-                item_writer.write(sb.toString());
-            }
-        }
-    }
-    
     @OnEntityPropertyChanged(classPattern = "CDOTA_Unit_Hero_.*", propertyPattern = "m_hItems.*")
     public void onItemChange(Context ctx, Entity et, FieldPath fp)
     {
@@ -171,95 +117,10 @@ public class Main {
         }
     }
 
-    @OnEntityPropertyChanged(classPattern = "CDOTAPlayer", propertyPattern = "m_iCursor.*")
-    public void onCursorChange(Context ctx, Entity et, FieldPath fp)
-    {
-        if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
-        {
-            int tmp_id = et.getProperty("m_iPlayerID");
-            if (cursor_updater_tick != ctx.getTick() || tmp_id != update_hero_id)
-            {     
-                update_hero_id = tmp_id;
-                cursor_updater_tick = ctx.getTick();
-            
-            
-                if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
-                    {
-                        // log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                        // log.info("tick {}, entity {}: {} {}", tick, et.getProperty("m_iPlayerID"), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(cursor_updater_tick + 1);
-                        sb.append(',');
-                        sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                        sb.append(',');
-                        sb.append(et.getProperty("m_iCursor.0000"));
-                        sb.append(',');
-                        sb.append(et.getProperty("m_iCursor.0001"));
-                        sb.append('\n');
-                        mouse_writer_updater.write(sb.toString());
-                    }
-            }
-        }
-    }
-
-    // @OnEntityUpdated
-    // protected void onUpdate(Context ctx, Entity et, FieldPath[] fieldPaths, int num) {        
-    // }
 
     public void run(String[] args) throws Exception {
-        mouse_writer = new PrintWriter(new File("test_mouse.csv"));
+        item_writer_updater = new PrintWriter(new File("test_item_change.csv"));
         StringBuilder sb = new StringBuilder();
-        sb.append("Tick");
-        sb.append(',');
-        sb.append("Hero");
-        sb.append(',');
-        sb.append("X");
-        sb.append(',');
-        sb.append("Y");
-        sb.append('\n');
-        mouse_writer.write(sb.toString());
-
-        mouse_writer_updater = new PrintWriter(new File("test_mouse_updater.csv"));
-        sb = new StringBuilder();
-        sb.append("Tick");
-        sb.append(',');
-        sb.append("Hero");
-        sb.append(',');
-        sb.append("X");
-        sb.append(',');
-        sb.append("Y");
-        sb.append('\n');
-        mouse_writer_updater.write(sb.toString());
-
-        item_writer = new PrintWriter(new File("test_item.csv"));
-        sb = new StringBuilder();
-        sb.append("Tick");
-        sb.append(',');
-        sb.append("Hero");
-        sb.append(',');
-        sb.append("Item1");
-        sb.append(',');
-        sb.append("Item2");
-        sb.append(',');
-        sb.append("Item3");
-        sb.append(',');
-        sb.append("Item4");
-        sb.append(',');
-        sb.append("Item5");
-        sb.append(',');
-        sb.append("Item6");
-        sb.append(',');
-        sb.append("Item7");
-        sb.append(',');
-        sb.append("Item8");
-        sb.append(',');
-        sb.append("Item9");
-        sb.append(',');
-        sb.append('\n');
-        item_writer.write(sb.toString());
-
-        item_writer_updater = new PrintWriter(new File("test_item_updater.csv"));
-        sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
         sb.append("Hero");
@@ -290,9 +151,6 @@ public class Main {
         new SimpleRunner(new MappedFileSource(args[0])).runWith(this);
         long tMatch = System.currentTimeMillis() - tStart;
         log.info("total time taken: {}s", (tMatch) / 1000.0);
-        mouse_writer.close();
-        mouse_writer_updater.close();
-        item_writer.close();
         item_writer_updater.close();
     }
 

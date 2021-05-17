@@ -92,6 +92,30 @@
                 <exampleName>click</exampleName>
             </properties>
         </profile>
+        <profile>
+            <id>cursor_all</id>
+            <properties>
+                <exampleName>cursor_all</exampleName>
+            </properties>
+        </profile>
+        <profile>
+            <id>cursor_change</id>
+            <properties>
+                <exampleName>cursor_change</exampleName>
+            </properties>
+        </profile>
+        <profile>
+            <id>item_all</id>
+            <properties>
+                <exampleName>item_all</exampleName>
+            </properties>
+        </profile>
+        <profile>
+            <id>item_change</id>
+            <properties>
+                <exampleName>item_change</exampleName>
+            </properties>
+        </profile>
     </profiles>
 
 </project>
