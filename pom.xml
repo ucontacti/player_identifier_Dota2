@@ -116,6 +116,12 @@
                 <exampleName>item_change</exampleName>
             </properties>
         </profile>
+        <profile>
+            <id>info</id>
+            <properties>
+                <exampleName>info</exampleName>
+            </properties>
+        </profile>
     </profiles>
 
 </project>

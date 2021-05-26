@@ -42,6 +42,10 @@ public class Main {
 
     // TODO: Improve hero recognition
     private boolean isHero(Entity e) {
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Hawk"))
+            return false;
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Boar"))
+            return false;
         return e.getDtClass().getDtName().startsWith("CDOTA_Unit_Hero");
     }
 
@@ -144,30 +148,33 @@ public class Main {
     @OnEntityPropertyChanged(classPattern = "CDOTA_Unit_Hero_.*", propertyPattern = "m_hItems.*")
     public void onItemChange(Context ctx, Entity et, FieldPath fp)
     {
-        if (item_updater_tick != ctx.getTick() || !et.getDtClass().getDtName().equals(update_hero_name))
-        {     
-            update_hero_name = et.getDtClass().getDtName();
-            item_updater_tick = ctx.getTick();
-            Entities entities = ctx.getProcessor(Entities.class);
-            StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
-            int itemId;
+        if(isHero(et))
+        {
+            if (item_updater_tick != ctx.getTick() || !et.getDtClass().getDtName().equals(update_hero_name))
+            {     
+                update_hero_name = et.getDtClass().getDtName();
+                item_updater_tick = ctx.getTick();
+                Entities entities = ctx.getProcessor(Entities.class);
+                StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
+                int itemId;
 
-            StringBuilder sb = new StringBuilder();
-            sb.append(item_updater_tick + 1);
-            sb.append(',');
-            sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-            for (int i=0; i<9; i++)
-            {
-                String item_slot = String.format("m_hItems.%04d", i);
-                int item_id = et.getProperty(item_slot);
-                String item_name = getEntityNameByHandle(item_id, entities, stringTable);
+                StringBuilder sb = new StringBuilder();
+                sb.append(item_updater_tick + 1);
                 sb.append(',');
-                // sb.append(item_name);
-                sb.append(item_id);
+                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                for (int i=0; i<9; i++)
+                {
+                    String item_slot = String.format("m_hItems.%04d", i);
+                    int item_id = et.getProperty(item_slot);
+                    String item_name = getEntityNameByHandle(item_id, entities, stringTable);
+                    sb.append(',');
+                    // sb.append(item_name);
+                    sb.append(item_id);
+                }
+                // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
+                sb.append('\n');
+                item_writer_updater.write(sb.toString());
             }
-            // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
-            sb.append('\n');
-            item_writer_updater.write(sb.toString());
         }
     }
 
@@ -207,7 +214,10 @@ public class Main {
     // }
 
     public void run(String[] args) throws Exception {
-        mouse_writer = new PrintWriter(new File("test_mouse.csv"));
+        String test = args[0];
+        
+        String output = "features/" + test.substring(test.lastIndexOf("ds/") + 3, test.lastIndexOf("s/") + 12) + "_cursor.csv";
+        mouse_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
@@ -219,7 +229,8 @@ public class Main {
         sb.append('\n');
         mouse_writer.write(sb.toString());
 
-        mouse_writer_updater = new PrintWriter(new File("test_mouse_updater.csv"));
+        output = "features/" + test.substring(test.lastIndexOf("ds/") + 3, test.lastIndexOf("s/") + 12) + "_cursor_updater.csv";
+        mouse_writer_updater = new PrintWriter(new File(output));
         sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
@@ -231,7 +242,8 @@ public class Main {
         sb.append('\n');
         mouse_writer_updater.write(sb.toString());
 
-        item_writer = new PrintWriter(new File("test_item.csv"));
+        output = "features/" + test.substring(test.lastIndexOf("ds/") + 3, test.lastIndexOf("s/") + 12) + "_item.csv";
+        item_writer = new PrintWriter(new File(output));
         sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
@@ -258,7 +270,8 @@ public class Main {
         sb.append('\n');
         item_writer.write(sb.toString());
 
-        item_writer_updater = new PrintWriter(new File("test_item_updater.csv"));
+        output = "features/" + test.substring(test.lastIndexOf("ds/") + 3, test.lastIndexOf("s/") + 12) + "_item_updater.csv";
+        item_writer_updater = new PrintWriter(new File(output));
         sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
