@@ -8,7 +8,28 @@ from sklearn.model_selection import train_test_split #for split the data
 
 # In[2]: Read data and split train and test data
 
-authentic_match_id = ["5910973712", "5911045449", "5912945803", "5913000523", "5915392078"]
+authentic_match_id = [
+        "5910973712", 
+        "5911045449", 
+        "5912945803", 
+        "5913000523", 
+        "5915392078", 
+        "5926851979",
+        "5910938862",
+        "5911183098",
+        "5913013389",
+        "5913161793",
+        "5913253454",
+        "5915090628",
+        "5915090081",
+        "5915136220",
+        "5915141664",
+        "5897360586",
+        "5895383034",
+        "5891679036",
+        "5890067094",
+        "5886259086"
+    ]
 max_tick = 0
 X = []
 y = []
@@ -36,7 +57,7 @@ for cursor_info in X:
         cursor_info = cursor_info.append(pddddd, ignore_index = True)
     new_X.append(cursor_info.to_numpy().flatten())
     
-X_train, X_test, y_train, y_test = train_test_split(new_X, y, test_size=0.20, random_state=24)
+X_train, X_test, y_train, y_test = train_test_split(new_X, y, test_size=0.20, random_state=15)
 
 # In[3]: Calculate eer rate
 from sklearn.metrics import make_scorer, roc_curve #for eer
@@ -52,21 +73,28 @@ def calculate_eer(y_true, y_score):
 # In[4]: Logistic Regression
 from sklearn.linear_model import LogisticRegression
 
-clf = LogisticRegression(random_state=24).fit(X_train, y_train)
+clf = LogisticRegression(random_state=15).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
 print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, average="macro")*100,2))
 print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, average="macro")*100,2))
 print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+print(prediction_rm)
+print(y_test)
+
+
 
 # In[4]: Decision Tree
 from sklearn.tree import DecisionTreeClassifier
 
-clf = DecisionTreeClassifier(random_state=24).fit(X_train, y_train)
+clf = DecisionTreeClassifier(random_state=15).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Decision Tree is ', round(accuracy_score(prediction_rm, y_test)*100,2))
 print('The precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, average="macro")*100,2))
 print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, average="macro")*100,2))
 print('The EER value of the Decision Tree is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+
+print(prediction_rm)
+print(y_test)
 
 # %%
