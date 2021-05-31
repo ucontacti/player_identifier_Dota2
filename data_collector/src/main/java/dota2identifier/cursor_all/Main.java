@@ -36,12 +36,17 @@ import java.util.Hashtable;
 import java.io.File;
 import java.io.PrintWriter;
 
+
 public class Main {
 
     private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
 
     // TODO: Improve hero recognition
     private boolean isHero(Entity e) {
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Hawk"))
+            return false;
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Boar"))
+            return false;
         return e.getDtClass().getDtName().startsWith("CDOTA_Unit_Hero");
     }
 
@@ -54,9 +59,8 @@ public class Main {
     private ArrayList<Entity> ent_list=new ArrayList<Entity>();
     private Hashtable<Integer, String> heroHashtbl = new Hashtable<Integer, String>();;
     private PrintWriter mouse_writer;
-    private PrintWriter mouse_writer_updater;
-    private PrintWriter item_writer;
-    private PrintWriter item_writer_updater;
+    private int tick_rate;
+
 
     public String getEntityNameByHandle(int id, Entities entities, StringTable stringTable) {
         Entity entity = entities.getByHandle(id);
@@ -91,39 +95,64 @@ public class Main {
     @OnTickStart
     public void OnTickEnd(Context ctx, boolean synthetic) {
         tick = ctx.getTick();
-        Entities entities = ctx.getProcessor(Entities.class);
-        StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
-        int itemId;
+        if ((tick % tick_rate) == 0)
+        {    
+            Entities entities = ctx.getProcessor(Entities.class);
+            StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
+            int itemId;
 
-        for (Entity et: ent_list)
-        {
-            // if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
-            // {
-            //     log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-            // }
-            if(et.getDtClass().getDtName().equals("CDOTAPlayer"))
+            for (Entity et: ent_list)
             {
-                if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
+                // if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
+                // {
+                //     log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
+                // }
+                if(et.getDtClass().getDtName().equals("CDOTAPlayer"))
                 {
-                    // log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                    // log.info("tick {}, entity {}: {} {}", tick, et.getProperty("m_iPlayerID"), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(tick);
-                    sb.append(',');
-                    sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                    sb.append(',');
-                    sb.append(et.getProperty("m_iCursor.0000"));
-                    sb.append(',');
-                    sb.append(et.getProperty("m_iCursor.0001"));
-                    sb.append('\n');
-                    mouse_writer.write(sb.toString());
+                    if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
+                    {
+                        // log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
+                        // log.info("tick {}, entity {}: {} {}", tick, et.getProperty("m_iPlayerID"), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(tick);
+                        sb.append(',');
+                        sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                        sb.append(',');
+                        sb.append(et.getProperty("m_iCursor.0000"));
+                        sb.append(',');
+                        sb.append(et.getProperty("m_iCursor.0001"));
+                        sb.append('\n');
+                        mouse_writer.write(sb.toString());
+                    }
                 }
             }
         }
     }
     
     public void run(String[] args) throws Exception {
-        mouse_writer = new PrintWriter(new File("test_cursor_all.csv"));
+        String rep_pwd = args[0];
+
+        if (args.length == 1)
+        {
+            log.info("No tick rate specified. Sampling on everytick.");
+            tick_rate = 1;
+        }
+        else
+        {
+            tick_rate = Integer.parseInt(args[1]);
+            if (tick_rate == 1 || tick_rate == 5 || tick_rate == 10 || tick_rate == 15 || tick_rate == 30)
+            {
+                ;
+            }
+            else
+            {
+                log.info("Tickrate should be one of the {1, 5, 10, 15, 30}. Sampling on everytick.");
+                tick_rate = 1;
+            }
+        }
+        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_cursor.csv";
+        
+        mouse_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
