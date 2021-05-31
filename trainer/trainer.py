@@ -43,7 +43,7 @@ for match_id in authentic_match_id:
     for cursor_info in dfs:
         steam_id = df_match_info.loc[df_match_info["Hero"] == cursor_info["Hero"].iloc[0]].iloc[0]["SteamId"]
         max_tick = cursor_info.shape[0] if cursor_info.shape[0] > max_tick else max_tick
-        X.append(cursor_info.drop("Hero", axis=1).drop("Tick", axis=1))
+        X.append(cursor_info.drop("Hero", axis=1))
         if steam_id == 76561198134243802:
             y.append(1)
         else:
@@ -51,6 +51,7 @@ for match_id in authentic_match_id:
 for cursor_info in X:
     if cursor_info.shape[0] < max_tick:
         pddddd = pd.DataFrame({
+                                "Tick": np.zeros(max_tick-cursor_info.shape[0]),
                                 "X": np.zeros(max_tick-cursor_info.shape[0]), 
                                 "Y": np.zeros(max_tick-cursor_info.shape[0])})
 
@@ -76,25 +77,42 @@ from sklearn.linear_model import LogisticRegression
 clf = LogisticRegression(random_state=15).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, average="macro")*100,2))
-print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, average="macro")*100,2))
-print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 print(prediction_rm)
 print(y_test)
 
 
 
-# In[4]: Decision Tree
+# In[5]: Decision Tree
 from sklearn.tree import DecisionTreeClassifier
 
 clf = DecisionTreeClassifier(random_state=15).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Decision Tree is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-print('The precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, average="macro")*100,2))
-print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, average="macro")*100,2))
-print('The EER value of the Decision Tree is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+print('The precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The EER value of the Decision Tree is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
 print(prediction_rm)
 print(y_test)
+
+# In[6]: Random Forest
+from sklearn.ensemble import RandomForestClassifier
+
+clf = RandomForestClassifier(random_state=15).fit(X_train, y_train)
+prediction_rm=clf.predict(X_test)
+print('The accuracy of the Random Forest is ', round(accuracy_score(prediction_rm, y_test)*100,2))
+print('The precision of the Random Forest is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The recall of the Random Forest is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The f1_score of the Random Forest is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The EER value of the Random Forest is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+
+print(prediction_rm)
+print(y_test)
+
 
 # %%
