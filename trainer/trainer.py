@@ -6,6 +6,21 @@ import pandas as pd
 from sklearn.model_selection import train_test_split #for split the data
 
 
+# In[1]: test
+df = pd.DataFrame({'time':[0,1,2], 'x':[1,2,4], 'y':[1,2,4]})
+df["v_x"] = df["x"].diff() / df["time"].diff()
+df["v_y"] = df["y"].diff() / df["time"].diff()
+df["v"] = (df["v_x"]**2 + df["v_y"]**2)**(1/2)
+df["a"] = df["v"].diff() / df["time"].diff()
+df["jer"] = df["a"].diff() / df["time"].diff()
+df["aom"] = np.arctan(df["x"].diff() / df["y"].diff())
+df["aom"] = df["aom"].cumsum()
+df["ang_v"] = df["aom"].diff() / df["time"].diff()
+df = df.fillna(0)
+print(df)
+
+
+
 # In[2]: Read data and split train and test data
 
 # authentic_match_id = [
@@ -193,11 +208,31 @@ for match_id in authentic_match_id:
         else:
             y.append(0)
 for cursor_info in X:
+    cursor_info["V_X"] = cursor_info["X"].diff() / cursor_info["Tick"].diff()
+    cursor_info["V_Y"] = cursor_info["Y"].diff() / cursor_info["Tick"].diff()
+    cursor_info["V"] = (cursor_info["V_X"]**2 + cursor_info["V_Y"]**2)**(1/2)
+    cursor_info["A"] = cursor_info["V"].diff() / cursor_info["Tick"].diff()
+    cursor_info["J"] = cursor_info["A"].diff() / cursor_info["Tick"].diff()
+    cursor_info["AoM"] = np.arctan(cursor_info["X"].diff() / cursor_info["Y"].diff())
+    cursor_info["AoM"] = cursor_info["AoM"].cumsum()
+    cursor_info["Ang_V"] = cursor_info["AoM"].diff() / cursor_info["Tick"].diff()
+    cursor_info.fillna(0, inplace=True)
+    cursor_info.drop("Tick", axis=1, inplace=True)
+    cursor_info.drop("X", axis=1, inplace=True)
+    cursor_info.drop("Y", axis=1, inplace=True)
+    cursor_info.replace([np.inf, -np.inf], 0, inplace=True)
     if cursor_info.shape[0] < max_tick:
         pddddd = pd.DataFrame({
-                                "Tick": np.zeros(max_tick-cursor_info.shape[0]),
-                                "X": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "Y": np.zeros(max_tick-cursor_info.shape[0])})
+                                # "Tick": np.zeros(max_tick-cursor_info.shape[0]),
+                                # "X": np.zeros(max_tick-cursor_info.shape[0]), 
+                                # "Y": np.zeros(max_tick-cursor_info.shape[0]), 
+                                "V_X": np.zeros(max_tick-cursor_info.shape[0]), 
+                                "V_Y": np.zeros(max_tick-cursor_info.shape[0]), 
+                                "V": np.zeros(max_tick-cursor_info.shape[0]), 
+                                "A": np.zeros(max_tick-cursor_info.shape[0]), 
+                                "J": np.zeros(max_tick-cursor_info.shape[0]), 
+                                "AoM": np.zeros(max_tick-cursor_info.shape[0]), 
+                                "Ang_V": np.zeros(max_tick-cursor_info.shape[0])})
 
         cursor_info = cursor_info.append(pddddd, ignore_index = True)
     new_X.append(cursor_info.to_numpy().flatten())
