@@ -130,7 +130,7 @@ public class Main {
             case "npc_dota_hero_grimstroke": return "CDOTA_Unit_Hero_Grimstroke";
             case "npc_dota_hero_mars": return "CDOTA_Unit_Hero_Mars";
             case "npc_dota_hero_snapfire": return "CDOTA_Unit_Hero_Snapfire";
-            case "npc_dota_hero_hoodwink": return "CDOTA_Unit_Hero_Hoowwink";
+            case "npc_dota_hero_hoodwink": return "CDOTA_Unit_Hero_Hoodwink";
             case "npc_dota_hero_dawnbreaker": return "CDOTA_Unit_Hero_Dawnbreaker";
             case "npc_dota_hero_arc_warden": return "CDOTA_Unit_Hero_ArcWarden";
             case "npc_dota_hero_winter_wyvern": return "CDOTA_Unit_Hero_Winter_Wyvern";
