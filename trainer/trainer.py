@@ -279,7 +279,6 @@ for match_id in authentic_match_id:
             X.append(cursor_info.drop("Hero", axis=1))
             y.append(0)
         
-        
 for cursor_info in X:
     cursor_info["V_X"] = cursor_info["X"].diff() / cursor_info["Tick"].diff()
     cursor_info["V_Y"] = cursor_info["Y"].diff() / cursor_info["Tick"].diff()

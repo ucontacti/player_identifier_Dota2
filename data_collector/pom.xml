@@ -122,6 +122,12 @@
                 <exampleName>info</exampleName>
             </properties>
         </profile>
+        <profile>
+            <id>unit_orders</id>
+            <properties>
+                <exampleName>unit_orders</exampleName>
+            </properties>
+        </profile>
     </profiles>
 
 </project>
