@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split #for split the data
 
+from sklearn.model_selection import KFold #for K-fold cross validation
+from sklearn.model_selection import cross_val_score #score evaluation
+
 
 # In[2]: Read data and split train and test data
 
@@ -333,6 +336,9 @@ print('The recall of the Logistic Regression is ', round(recall_score(prediction
 print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
+kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+result_rm=cross_val_score(clf, new_X, y, cv=5,scoring='accuracy')
+print('The cross validated score for Logistic Regression is:',round(result_rm.mean()*100,2))
 
 
 # In[5]: Decision Tree
@@ -346,6 +352,10 @@ print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y
 print('The f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Decision Tree is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
+kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+result_rm=cross_val_score(clf, new_X, y, cv=5,scoring='accuracy')
+print('The cross validated score for Decision Tree is:',round(result_rm.mean()*100,2))
+
 
 # In[6]: Random Forest
 from sklearn.ensemble import RandomForestClassifier
@@ -357,6 +367,10 @@ print('The precision of the Random Forest is ', round(precision_score(prediction
 print('The recall of the Random Forest is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 print('The f1_score of the Random Forest is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Random Forest is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+
+kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+result_rm=cross_val_score(clf, new_X, y, cv=5,scoring='accuracy')
+print('The cross validated score for Random Forest is:',round(result_rm.mean()*100,2))
 
 
 # %%
