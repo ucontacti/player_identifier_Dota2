@@ -45,6 +45,10 @@ public class Main {
 
     // TODO: Improve hero recognition
     private boolean isHero(Entity e) {
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Hawk"))
+            return false;
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Boar"))
+            return false;
         return e.getDtClass().getDtName().startsWith("CDOTA_Unit_Hero");
     }
 
@@ -88,16 +92,14 @@ public class Main {
     @UsesStringTable("EntityNames")
     @UsesEntities
     @OnMessage(DotaUserMessages.CDOTAUserMsg_SpectatorPlayerUnitOrders.class)
-    public void onMessage(Context ctx, DotaUserMessages.CDOTAUserMsg_SpectatorPlayerUnitOrders message) {
-        tick = ctx.getTick();
-        Entity et = ctx.getProcessor(Entities.class).getByIndex(message.getEntindex());
-        Entities entities = ctx.getProcessor(Entities.class);
+    public void onMessage(Context ctx, DotaUserMessages.CDOTAUserMsg_SpectatorPlayerUnitOrders message) 
+    {
+        Entity et = ctx.getProcessor(Entities.class).getByIndex(message.getEntindex()); 
         StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
-        // Divide message type into actions
         StringBuilder sb = new StringBuilder();
         switch (message.getOrderType()) {
-        case 1:
-            sb.append(tick);
+        case 1: // move action
+            sb.append(ctx.getTick() + 1);
             sb.append(',');
             sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
             sb.append(',');
@@ -105,23 +107,30 @@ public class Main {
             sb.append('\n');
             action_writer.write(sb.toString());
             break;
-        case 2:
+        case 2: // attack action
+        case 3:
         case 4:
-            sb.append(tick);
+            sb.append(ctx.getTick() + 1);
             sb.append(',');
             sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
             sb.append(',');
             sb.append('A');
             sb.append('\n');
             action_writer.write(sb.toString());
+            break;
+        case 5: // cast spell action
+        case 6:
+        case 7:
         case 8:
-            sb.append(tick);
+        case 9:
+            sb.append(ctx.getTick() + 1);
             sb.append(',');
             sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
             sb.append(',');
             sb.append('S');
             sb.append('\n');
             action_writer.write(sb.toString());
+            break;
         }    
     //     if (message.hasAbilityId())
     //     {
@@ -143,7 +152,10 @@ public class Main {
 
 
     public void run(String[] args) throws Exception {
-        action_writer = new PrintWriter(new File("test_unit.csv"));
+        String rep_pwd = args[0];
+        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order.csv";
+        
+        action_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
