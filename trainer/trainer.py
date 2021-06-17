@@ -8,13 +8,16 @@ from sklearn.model_selection import train_test_split #for split the data
 from sklearn.model_selection import KFold #for K-fold cross validation
 from sklearn.model_selection import cross_val_score #score evaluation
 
+from progress.bar import Bar
 
 # In[3]: Atomic mouse actions
 from file_names import authentic_match_id
-
+pd.options.mode.chained_assignment = None
 
 max_tick = 0
 X = []
+new_X = []
+y = []
 counter = 0 
 
 move_order = pd.DataFrame(columns=[
@@ -50,116 +53,116 @@ spell_order = pd.DataFrame(columns=[
     "Ang_V_min", "Ang_V_max", "Ang_V_mean", "Ang_V_std", 
     "tick_delta", "d" 
     ])
-
+bar = Bar('Processing', max=len(authentic_match_id))
 for match_id in authentic_match_id:
     df_cursor = pd.read_csv("../data_collector/features/" + match_id + "_cursor_tmp.csv")
     df_unit_order = pd.read_csv("../data_collector/features/" + match_id + "_unit_order.csv")
     df_unit_order.drop_duplicates(inplace=True)
     df_match_info = pd.read_csv("../data_collector/features/" + match_id + "_info.csv")
 
-    # dfs_cursor = [rows for _, rows in df_cursor.groupby('Hero')]
+    dfs_cursor = [rows for _, rows in df_cursor.groupby('Hero')]
     dfs_unit_order = [rows for _, rows in df_unit_order.groupby('Hero')]
     for hero in dfs_unit_order:
-        beginning = True
         steam_id = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["SteamId"]
         hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
-        for index, row in hero.iterrows():
 
-            if beginning == True:
-                prev_row = row
-                beginning = False
-                continue
-            df_ticks = df_cursor[(df_cursor["Tick"] > prev_row["Tick"]) & (df_cursor["Tick"] <= row["Tick"]) & (row["Hero"] == df_cursor["Hero"])]
-            
-            prev_row = row
-            if df_ticks.empty:
-                continue
-            df_ticks["V_X"] = df_ticks["X"].diff() / df_ticks["Tick"].diff()
-            df_ticks["V_Y"] = df_ticks["Y"].diff() / df_ticks["Tick"].diff()
-            df_ticks["V"] = (df_ticks["V_X"]**2 + df_ticks["V_Y"]**2)**(1/2)
-            df_ticks["A"] = df_ticks["V"].diff() / df_ticks["Tick"].diff()
-            df_ticks["J"] = df_ticks["A"].diff() / df_ticks["Tick"].diff()
-            df_ticks["AoM"] = np.arctan(df_ticks["X"].diff() / df_ticks["Y"].diff())
-            df_ticks["AoM"] = df_ticks["AoM"].cumsum()
-            df_ticks["Ang_V"] = df_ticks["AoM"].diff() / df_ticks["Tick"].diff()
-            df_ticks.fillna(0, inplace=True)
-            p_init = pd.Series([df_ticks.iloc[0]["X"], df_ticks.iloc[0]["Y"]])
-            p_fin = pd.Series([df_ticks.iloc[-1]["X"], df_ticks.iloc[-1]["Y"]])
-            new_row = {"Hero": hero_name, "SteamId": steam_id,
-                    "V_X_min":df_ticks["V_X"].min(), "V_X_max":df_ticks["V_X"].max(), "V_X_mean":df_ticks["V_X"].mean(), "V_X_std":df_ticks["V_X"].std(),
-                    "V_Y_min":df_ticks["V_Y"].min(), "V_Y_max":df_ticks["V_Y"].max(), "V_Y_mean":df_ticks["V_Y"].mean(), "V_Y_std":df_ticks["V_Y"].std(),
-                    "V_min":df_ticks["V"].min(), "V_max":df_ticks["V"].max(), "V_mean":df_ticks["V"].mean(), "V_std":df_ticks["V"].std(),
-                    "A_min":df_ticks["A"].min(), "A_max":df_ticks["A"].max(), "A_mean":df_ticks["A"].mean(), "A_std":df_ticks["A"].std(),
-                    "J_min":df_ticks["J"].min(), "J_max":df_ticks["J"].max(), "J_mean":df_ticks["J"].mean(), "J_std":df_ticks["J"].std(),
-                    "AoM_min":df_ticks["AoM"].min(), "AoM_max":df_ticks["AoM"].max(), "AoM_mean":df_ticks["AoM"].mean(), "AoM_std":df_ticks["AoM"].std(),
-                    "Ang_V_min":df_ticks["Ang_V"].min(), "Ang_V_max":df_ticks["Ang_V"].max(), "Ang_V_mean":df_ticks["Ang_V"].mean(), "Ang_V_std":df_ticks["Ang_V"].std(),
-                    "tick_delta": df_ticks.shape[0], "d": np.linalg.norm(p_init - p_fin)
-                }
-            if row["Action"] == "M":
-                move_order.append(new_row, ignore_index=True)
-            elif row["Action"] == "A":
-                attack_order.append(new_row, ignore_index=True)
-            elif row["Action"] == "S":
-                spell_order.append(new_row, ignore_index=True)
-
-    
-print("Done")
-# In[2]: Read data and split train and test data
-from file_names import authentic_match_id
-
-max_tick = 0
-X = []
-y = []
-new_X = []
-counter = 0 
-for match_id in authentic_match_id:
-    df_cursor = pd.read_csv("../data_collector/features/" + match_id + "_cursor.csv")
-    df_match_info = pd.read_csv("../data_collector/features/" + match_id + "_info.csv")
-
-    dfs = [rows for _, rows in df_cursor.groupby('Hero')]
-    for cursor_info in dfs:
-        steam_id = df_match_info.loc[df_match_info["Hero"] == cursor_info["Hero"].iloc[0]].iloc[0]["SteamId"]
-        hero_name = df_match_info.loc[df_match_info["Hero"] == cursor_info["Hero"].iloc[0]].iloc[0]["Hero"]
-        max_tick = cursor_info.shape[0] if cursor_info.shape[0] > max_tick else max_tick
         if steam_id == 76561198134243802:
             if hero_name == "CDOTA_Unit_Hero_Puck":
                 y.append(1)
-                X.append(cursor_info.drop("Hero", axis=1))
+            else: continue
         else:
-            X.append(cursor_info.drop("Hero", axis=1))
             y.append(0)
-        
-for cursor_info in X:
-    cursor_info["V_X"] = cursor_info["X"].diff() / cursor_info["Tick"].diff()
-    cursor_info["V_Y"] = cursor_info["Y"].diff() / cursor_info["Tick"].diff()
-    cursor_info["V"] = (cursor_info["V_X"]**2 + cursor_info["V_Y"]**2)**(1/2)
-    cursor_info["A"] = cursor_info["V"].diff() / cursor_info["Tick"].diff()
-    cursor_info["J"] = cursor_info["A"].diff() / cursor_info["Tick"].diff()
-    cursor_info["AoM"] = np.arctan(cursor_info["X"].diff() / cursor_info["Y"].diff())
-    cursor_info["AoM"] = cursor_info["AoM"].cumsum()
-    cursor_info["Ang_V"] = cursor_info["AoM"].diff() / cursor_info["Tick"].diff()
-    cursor_info.fillna(0, inplace=True)
-    cursor_info.drop("Tick", axis=1, inplace=True)
-    cursor_info.drop("X", axis=1, inplace=True)
-    cursor_info.drop("Y", axis=1, inplace=True)
-    cursor_info.replace([np.inf, -np.inf], 0, inplace=True)
-    if cursor_info.shape[0] < max_tick:
-        pddddd = pd.DataFrame({
-                                # "Tick": np.zeros(max_tick-cursor_info.shape[0]),
-                                # "X": np.zeros(max_tick-cursor_info.shape[0]), 
-                                # "Y": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "V_X": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "V_Y": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "V": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "A": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "J": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "AoM": np.zeros(max_tick-cursor_info.shape[0]), 
-                                "Ang_V": np.zeros(max_tick-cursor_info.shape[0])})
 
-        cursor_info = cursor_info.append(pddddd, ignore_index = True)
-    new_X.append(cursor_info.to_numpy().flatten())
+        df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
+        df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], np.unique(hero["Tick"].values))
+        df_hero_cursor.dropna(inplace=True)
+        df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["V"] = (df_hero_cursor["V_X"]**2 + df_hero_cursor["V_Y"]**2)**(1/2)
+        df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["AoM"] = np.arctan(df_hero_cursor["X"].diff() / df_hero_cursor["Y"].diff())
+        df_hero_cursor["AoM"] = df_hero_cursor["AoM"].cumsum()
+        df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["Ang_V"].fillna(0, inplace=True)
+        atomic_order = df_hero_cursor.groupby("range").agg({"Tick": "count", "V_X":["min", "max", "mean", "std"], 
+            "V_Y":["min", "max", "mean", "std"],
+            "V":["min", "max", "mean", "std"],
+            "A":["min", "max", "mean", "std"],
+            "J":["min", "max", "mean", "std"],
+            "AoM":["min", "max", "mean", "std"],
+            "Ang_V":["min", "max", "mean", "std"],
+            }).fillna(0).replace([np.inf, -np.inf], 0).to_numpy().flatten()
+        max_tick = atomic_order.size if atomic_order.size > max_tick else max_tick
+        new_X.append(atomic_order)
+
+            # if row["Action"] == "M":
+        # move_order.append(new_row, ignore_index=True)
+            # elif row["Action"] == "A":
+            #     attack_order.append(new_row, ignore_index=True)
+            # elif row["Action"] == "S":
+            #     spell_order.append(new_row, ignore_index=True)
+    bar.next()
+new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
+X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.20, random_state=15)
+bar.finish()
+
+# In[2]: Read data and split train and test data
+# from file_names import authentic_match_id
+
+# max_tick = 0
+# X = []
+# y = []
+# new_X = []
+# counter = 0 
+# for match_id in authentic_match_id:
+#     df_cursor = pd.read_csv("../data_collector/features/" + match_id + "_cursor.csv")
+#     df_match_info = pd.read_csv("../data_collector/features/" + match_id + "_info.csv")
+
+#     dfs = [rows for _, rows in df_cursor.groupby('Hero')]
+#     for cursor_info in dfs:
+#         steam_id = df_match_info.loc[df_match_info["Hero"] == cursor_info["Hero"].iloc[0]].iloc[0]["SteamId"]
+#         hero_name = df_match_info.loc[df_match_info["Hero"] == cursor_info["Hero"].iloc[0]].iloc[0]["Hero"]
+#         max_tick = cursor_info.shape[0] if cursor_info.shape[0] > max_tick else max_tick
+#         if steam_id == 76561198134243802:
+#             if hero_name == "CDOTA_Unit_Hero_Puck":
+#                 y.append(1)
+#                 X.append(cursor_info.drop("Hero", axis=1))
+#         else:
+#             X.append(cursor_info.drop("Hero", axis=1))
+#             y.append(0)
+        
+# for cursor_info in X:
+#     cursor_info["V_X"] = cursor_info["X"].diff() / cursor_info["Tick"].diff()
+#     cursor_info["V_Y"] = cursor_info["Y"].diff() / cursor_info["Tick"].diff()
+#     cursor_info["V"] = (cursor_info["V_X"]**2 + cursor_info["V_Y"]**2)**(1/2)
+#     cursor_info["A"] = cursor_info["V"].diff() / cursor_info["Tick"].diff()
+#     cursor_info["J"] = cursor_info["A"].diff() / cursor_info["Tick"].diff()
+#     cursor_info["AoM"] = np.arctan(cursor_info["X"].diff() / cursor_info["Y"].diff())
+#     cursor_info["AoM"] = cursor_info["AoM"].cumsum()
+#     cursor_info["Ang_V"] = cursor_info["AoM"].diff() / cursor_info["Tick"].diff()
+#     cursor_info.fillna(0, inplace=True)
+#     cursor_info.drop("Tick", axis=1, inplace=True)
+#     cursor_info.drop("X", axis=1, inplace=True)
+#     cursor_info.drop("Y", axis=1, inplace=True)
+#     cursor_info.replace([np.inf, -np.inf], 0, inplace=True)
+#     if cursor_info.shape[0] < max_tick:
+#         pddddd = pd.DataFrame({
+#                                 # "Tick": np.zeros(max_tick-cursor_info.shape[0]),
+#                                 # "X": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 # "Y": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 "V_X": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 "V_Y": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 "V": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 "A": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 "J": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 "AoM": np.zeros(max_tick-cursor_info.shape[0]), 
+#                                 "Ang_V": np.zeros(max_tick-cursor_info.shape[0])})
+
+#         cursor_info = cursor_info.append(pddddd, ignore_index = True)
+#     new_X.append(cursor_info.to_numpy().flatten())
     
-X_train, X_test, y_train, y_test = train_test_split(new_X, y, test_size=0.20, random_state=15)
+# X_train, X_test, y_train, y_test = train_test_split(new_X, y, test_size=0.20, random_state=15)
 
 # In[3]: Calculate eer rate
 from sklearn.metrics import make_scorer, roc_curve #for eer
