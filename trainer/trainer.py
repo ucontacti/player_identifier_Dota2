@@ -88,9 +88,9 @@ for match_id in authentic_match_id:
             }).fillna(0).replace([np.inf, -np.inf], 0)
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
         atomic_order_arr = atomic_order.to_numpy().flatten()
-        # max_tick = atomic_order_arr.size if atomic_order_arr.size > max_tick else max_tick
-        if atomic_order_arr.size < 2000:
+        if atomic_order_arr.size < 3000:
             continue
+        # max_tick = atomic_order_arr.size if atomic_order_arr.size > max_tick else max_tick
         min_tick = atomic_order_arr.size if atomic_order_arr.size < min_tick else min_tick
         
         if steam_id == 76561198134243802:
@@ -112,6 +112,9 @@ for match_id in authentic_match_id:
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
 new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
+# new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
+np.savetxt('atomic.txt', np.array(new_X_padded))
+np.savetxt('atomic_lbl.txt', np.array(y))
 X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.20, random_state=42)
 # bar.finish()
 
@@ -183,8 +186,11 @@ def calculate_eer(y_true, y_score):
 
 
 # In[4]: Logistic Regression
-print("fine")
 from sklearn.linear_model import LogisticRegression
+
+new_X_padded = np.loadtxt("atomic.txt")
+y = np.loadtxt("atomic_lbl.txt")
+X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.30, random_state=42)
 
 clf = LogisticRegression(random_state=42).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
@@ -193,7 +199,6 @@ print('The precision of the Logistic Regression is ', round(precision_score(pred
 print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
-print("fine")
 
 kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
 result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
