@@ -71,13 +71,20 @@ for match_id in authentic_match_id:
         df_hero_cursor.dropna(inplace=True)
         df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
-        df_hero_cursor["V"] = (df_hero_cursor["V_X"]**2 + df_hero_cursor["V_Y"]**2)**(1/2)
+        df_hero_cursor["V"] = np.sqrt(df_hero_cursor["V_X"]**2 + df_hero_cursor["V_Y"]**2)
+        df_hero_cursor["S"] = np.sqrt((df_hero_cursor["X"].diff())**2 + (df_hero_cursor["Y"].diff())**2)
+        df_hero_cursor.fillna({"S":0}, inplace=True)
+        df_hero_cursor["S"] = np.cumsum(df_hero_cursor["S"])
         df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["AoM"] = np.arctan(df_hero_cursor["X"].diff() / df_hero_cursor["Y"].diff())
-        df_hero_cursor["AoM"] = df_hero_cursor["AoM"].cumsum()
+        df_hero_cursor.fillna({"AoM":0}, inplace=True)
+        df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
         df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["Tick"].diff()
-        df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0}, inplace=True)
+        df_hero_cursor["Cur"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["S"].diff()
+        df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
+        # df_hero_cursor.drop("S", axis=1, inplace=True)
+        df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0}, inplace=True)
         atomic_order = df_hero_cursor.groupby("range").agg({"Tick": "count", "V_X":["min", "max", "mean", "std"], 
             "V_Y":["min", "max", "mean", "std"],
             "V":["min", "max", "mean", "std"],
@@ -85,6 +92,8 @@ for match_id in authentic_match_id:
             "J":["min", "max", "mean", "std"],
             "AoM":["min", "max", "mean", "std"],
             "Ang_V":["min", "max", "mean", "std"],
+            "Cur":["min", "max", "mean", "std"],
+            "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
         atomic_order_arr = atomic_order.to_numpy().flatten()
