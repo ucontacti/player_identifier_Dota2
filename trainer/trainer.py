@@ -82,9 +82,9 @@ for match_id in authentic_match_id:
         df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
         df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["Cur"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["S"].diff()
-        df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
+        # df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
         # df_hero_cursor.drop("S", axis=1, inplace=True)
-        df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0}, inplace=True)
+        df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0}, inplace=True)
         atomic_order = df_hero_cursor.groupby("range").agg({"Tick": "count", "V_X":["min", "max", "mean", "std"], 
             "V_Y":["min", "max", "mean", "std"],
             "V":["min", "max", "mean", "std"],
@@ -92,12 +92,12 @@ for match_id in authentic_match_id:
             "J":["min", "max", "mean", "std"],
             "AoM":["min", "max", "mean", "std"],
             "Ang_V":["min", "max", "mean", "std"],
-            "Cur":["min", "max", "mean", "std"],
-            "Cur_cr":["min", "max", "mean", "std"],
+            "Cur":["min", "max", "mean", "std"]
+            # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
         atomic_order_arr = atomic_order.to_numpy().flatten()
-        if atomic_order_arr.size < 3000:
+        if atomic_order_arr.size < 15000:
             continue
         # max_tick = atomic_order_arr.size if atomic_order_arr.size > max_tick else max_tick
         min_tick = atomic_order_arr.size if atomic_order_arr.size < min_tick else min_tick
@@ -199,9 +199,9 @@ from sklearn.linear_model import LogisticRegression
 
 new_X_padded = np.loadtxt("atomic.txt")
 y = np.loadtxt("atomic_lbl.txt")
-X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.30, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.20, random_state=42)
 
-clf = LogisticRegression(random_state=42).fit(X_train, y_train)
+clf = LogisticRegression(random_state=42, max_iter=400).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
 print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
