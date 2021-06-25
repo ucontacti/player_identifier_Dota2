@@ -13,11 +13,7 @@ from progress.bar import Bar
 # In[3]: Atomic mouse actions
 from file_names import authentic_match_id
 
-max_tick = 0
-min_tick = np.inf
-X = []
 new_X = []
-y = []
 counter = 1
 
 move_order = pd.DataFrame(columns=[
@@ -96,19 +92,7 @@ for match_id in authentic_match_id:
             # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
-        atomic_order_arr = atomic_order.to_numpy().flatten()
-        if atomic_order_arr.size < 15000:
-            continue
-        # max_tick = atomic_order_arr.size if atomic_order_arr.size > max_tick else max_tick
-        min_tick = atomic_order_arr.size if atomic_order_arr.size < min_tick else min_tick
-        
-        if steam_id == 76561198134243802:
-            if hero_name == "CDOTA_Unit_Hero_Puck":
-                y.append(1)
-            else: continue
-        else:
-            y.append(0)
-        
+        atomic_order_arr = [[steam_id, hero_name], atomic_order.to_numpy().flatten()]
         new_X.append(atomic_order_arr)
 
             # if row["Action"] == "M":
@@ -120,12 +104,38 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
+np.save('atomic.npy', new_X, allow_pickle=True)
+# bar.finish()
+
+# In[3]: Trim data to our need
+X = np.load('atomic.npy', allow_pickle=True)
+new_X = []
+max_tick = 0
+min_tick = np.inf
+y = []
+
+
+for inst in X:
+    atomic_inst = inst[1]
+    steam_id = inst[0][0]
+    hero_name = inst[0][1]
+    if atomic_inst.size < 15000:
+        continue
+    # max_tick = atomic_inst.size if atomic_inst.size > max_tick else max_tick
+    min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
+
+    if steam_id == 76561198134243802:
+        if hero_name == "CDOTA_Unit_Hero_Puck":
+            y.append(1)
+        else: continue
+    else:
+        y.append(0)
+    new_X.append(atomic_inst)
+
 new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
 # new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
-np.savetxt('atomic.txt', np.array(new_X_padded))
-np.savetxt('atomic_lbl.txt', np.array(y))
 X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.20, random_state=42)
-# bar.finish()
+
 
 # In[2]: Read data and split train and test data
 # from file_names import authentic_match_id
