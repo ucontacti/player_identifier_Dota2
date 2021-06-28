@@ -50,7 +50,10 @@ match_id_list = [
     "5808584619",
 ]
 import requests, json
-import urllib.request
+import urllib
+import socks
+from sockshandler import SocksiPyHandler
+from socks5_auth import socks5user, socks5pass
 
 counter = 1
 for match in match_id_list:
@@ -61,6 +64,16 @@ for match in match_id_list:
     demo_url = "http://replay" + str(json_data[0]["cluster"]) + ".valve.net/570/" + str(json_data[0]["match_id"]) + "_" + str(json_data[0]["replay_salt"]) + ".dem.bz2"
     save_to = "downloads/" + match + ".dem.bz2"
     print("Getting ready to download replay " + str(counter) + " match_id: " + match)
+
+
+    proxy = SocksiPyHandler(socks.SOCKS5, "amsterdam.nl.socks.nordhold.net", 1080, username=socks5user, password=socks5pass)
+    opener = urllib.request.build_opener(proxy)
+    urllib.request.install_opener(opener)
+    
+    requestt = urllib.request.urlopen("http://ip.42.pl/raw").read()
+    print(requestt)
+    print(demo_url)
+    
     urllib.request.urlretrieve(demo_url, save_to)
     print("Downloaded replay " + str(counter))
     counter += 1
