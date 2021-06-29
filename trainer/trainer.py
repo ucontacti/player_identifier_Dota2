@@ -119,10 +119,10 @@ for inst in X:
     atomic_inst = inst[1]
     steam_id = inst[0][0]
     hero_name = inst[0][1]
-    if atomic_inst.size < 15000:
+    if atomic_inst.size < 2000 or atomic_inst.size > 60000:
         continue
     # max_tick = atomic_inst.size if atomic_inst.size > max_tick else max_tick
-    min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
+    # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
 
     if steam_id == 76561198134243802:
         if hero_name == "CDOTA_Unit_Hero_Puck":
@@ -131,10 +131,11 @@ for inst in X:
     else:
         y.append(0)
     new_X.append(atomic_inst)
-
-new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
+med_tick = 25000
+# new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
 # new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
-X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.20, random_state=42)
+new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
+X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.25, random_state=42)
 
 
 # In[2]: Read data and split train and test data
@@ -207,11 +208,7 @@ def calculate_eer(y_true, y_score):
 # In[4]: Logistic Regression
 from sklearn.linear_model import LogisticRegression
 
-new_X_padded = np.loadtxt("atomic.txt")
-y = np.loadtxt("atomic_lbl.txt")
-X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.20, random_state=42)
-
-clf = LogisticRegression(random_state=42, max_iter=400).fit(X_train, y_train)
+clf = LogisticRegression(random_state=42, max_iter=200).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
 print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
@@ -220,8 +217,8 @@ print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_r
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
 kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+# print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
 result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
 print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
 result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
@@ -240,8 +237,10 @@ print('The f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_t
 # print('The EER value of the Decision Tree is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
 kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-print('----------------------The cross validated score for Decision Tree is:',round(result_rm.mean()*100,2))
+result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
+print('----------------------The cross validated precision score for Decision Tree is:',round(result_rm.mean()*100,2))
+result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
+print('----------------------The cross validated recall score for Decision Tree is:',round(result_rm.mean()*100,2))
 
 
 # In[6]: Random Forest
@@ -255,9 +254,9 @@ print('The recall of the Random Forest is ', round(recall_score(prediction_rm, y
 print('The f1_score of the Random Forest is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Random Forest is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
-kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-print('----------------------The cross validated score for Random Forest is:',round(result_rm.mean()*100,2))
+# kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+# print('----------------------The cross validated score for Random Forest is:',round(result_rm.mean()*100,2))
 
 
 # %%
