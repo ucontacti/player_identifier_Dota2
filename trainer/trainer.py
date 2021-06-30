@@ -15,40 +15,11 @@ from file_names import authentic_match_id
 
 new_X = []
 counter = 1
+new_X_mov = []
+new_X_att = []
+new_X_spl = []
 
-move_order = pd.DataFrame(columns=[
-    "Hero", "SteamId",
-    "V_X_min", "V_X_max", "V_X_mean", "V_X_std", 
-    "V_Y_min", "V_Y_max", "V_Y_mean", "V_Y_std", 
-    "V_min", "V_max", "V_mean", "V_std", 
-    "A_min", "A_max", "A_mean", "A_std", 
-    "J_min", "J_max", "J_mean", "J_std", 
-    "AoM_min", "AoM_max", "AoM_mean", "AoM_std", 
-    "Ang_V_min", "Ang_V_max", "Ang_V_mean", "Ang_V_std", 
-    "tick_delta", "d" 
-    ])
-attack_order = pd.DataFrame(columns=[
-    "Hero", "SteamId",
-    "V_X_min", "V_X_max", "V_X_mean", "V_X_std", 
-    "V_Y_min", "V_Y_max", "V_Y_mean", "V_Y_std", 
-    "V_min", "V_max", "V_mean", "V_std", 
-    "A_min", "A_max", "A_mean", "A_std", 
-    "J_min", "J_max", "J_mean", "J_std", 
-    "AoM_min", "AoM_max", "AoM_mean", "AoM_std", 
-    "Ang_V_min", "Ang_V_max", "Ang_V_mean", "Ang_V_std", 
-    "tick_delta", "d" 
-    ])
-spell_order = pd.DataFrame(columns=[
-    "Hero", "SteamId",
-    "V_X_min", "V_X_max", "V_X_mean", "V_X_std", 
-    "V_Y_min", "V_Y_max", "V_Y_mean", "V_Y_std", 
-    "V_min", "V_max", "V_mean", "V_std", 
-    "A_min", "A_max", "A_mean", "A_std", 
-    "J_min", "J_max", "J_mean", "J_std", 
-    "AoM_min", "AoM_max", "AoM_mean", "AoM_std", 
-    "Ang_V_min", "Ang_V_max", "Ang_V_mean", "Ang_V_std", 
-    "tick_delta", "d" 
-    ])
+
 # bar = Bar('Processing', max=len(authentic_match_id))
 for match_id in authentic_match_id:
     df_cursor = pd.read_csv("../data_collector/features/" + match_id + "_cursor_tmp.csv")
@@ -97,19 +68,26 @@ for match_id in authentic_match_id:
             # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
+        atomic_order_move = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] == 1].index)
+        atomic_order_attack = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] == 2].index)
+        atomic_order_spell = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] == 3].index)
+        atomic_order_move_arr = [[steam_id, hero_name], atomic_order_move.to_numpy().flatten()]
+        atomic_order_attack_arr = [[steam_id, hero_name], atomic_order_attack.to_numpy().flatten()]
+        atomic_order_spell_arr = [[steam_id, hero_name], atomic_order_spell.to_numpy().flatten()]
         atomic_order_arr = [[steam_id, hero_name], atomic_order.to_numpy().flatten()]
+        new_X_mov.append(atomic_order_move_arr)
+        new_X_att.append(atomic_order_attack_arr)
+        new_X_spl.append(atomic_order_spell_arr)
         new_X.append(atomic_order_arr)
 
-            # if row["Action"] == "M":
-        # move_order.append(new_row, ignore_index=True)
-            # elif row["Action"] == "A":
-            #     attack_order.append(new_row, ignore_index=True)
-            # elif row["Action"] == "S":
-            #     spell_order.append(new_row, ignore_index=True)
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
+np.save('atomic_move.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell.npy', new_X_spl, allow_pickle=True)
 np.save('atomic.npy', new_X, allow_pickle=True)
+
 # bar.finish()
 
 # In[3]: Trim data to our need
