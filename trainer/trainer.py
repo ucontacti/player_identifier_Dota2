@@ -54,6 +54,7 @@ for match_id in authentic_match_id:
     df_cursor = pd.read_csv("../data_collector/features/" + match_id + "_cursor_tmp.csv")
     df_unit_order = pd.read_csv("../data_collector/features/" + match_id + "_unit_order.csv")
     df_unit_order.drop_duplicates(inplace=True)
+    df_unit_order.replace({"Action": {'M': 1, 'A': 2, 'S': 3},}, inplace=True)
     df_match_info = pd.read_csv("../data_collector/features/" + match_id + "_info.csv")
 
     dfs_cursor = [rows for _, rows in df_cursor.groupby('Hero')]
@@ -61,9 +62,10 @@ for match_id in authentic_match_id:
     for hero in dfs_unit_order:
         steam_id = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["SteamId"]
         hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
-
+        hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
         df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
-        df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], np.unique(hero["Tick"].values))
+        df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
+        df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], hero["Tick"].values)
         df_hero_cursor.dropna(inplace=True)
         df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
@@ -79,9 +81,12 @@ for match_id in authentic_match_id:
         df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["Cur"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["S"].diff()
         # df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
-        # df_hero_cursor.drop("S", axis=1, inplace=True)
+        # df_hero_cursor.drop("S", axis=0, inplace=True)
         df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0}, inplace=True)
-        atomic_order = df_hero_cursor.groupby("range").agg({"Tick": "count", "V_X":["min", "max", "mean", "std"], 
+        atomic_order = df_hero_cursor.groupby("range").agg({
+            "Tick": "count", 
+            "Action": "first",
+            "V_X":["min", "max", "mean", "std"], 
             "V_Y":["min", "max", "mean", "std"],
             "V":["min", "max", "mean", "std"],
             "A":["min", "max", "mean", "std"],
