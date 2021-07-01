@@ -68,9 +68,9 @@ for match_id in authentic_match_id:
             # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
-        atomic_order_move = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] == 1].index)
-        atomic_order_attack = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] == 2].index)
-        atomic_order_spell = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] == 3].index)
+        atomic_order_move = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 1].index)
+        atomic_order_attack = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 2].index)
+        atomic_order_spell = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 3].index)
         atomic_order_move_arr = [[steam_id, hero_name], atomic_order_move.to_numpy().flatten()]
         atomic_order_attack_arr = [[steam_id, hero_name], atomic_order_attack.to_numpy().flatten()]
         atomic_order_spell_arr = [[steam_id, hero_name], atomic_order_spell.to_numpy().flatten()]
@@ -83,15 +83,16 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-np.save('atomic_move.npy', new_X_mov, allow_pickle=True)
-np.save('atomic_attack.npy', new_X_att, allow_pickle=True)
-np.save('atomic_spell.npy', new_X_spl, allow_pickle=True)
-np.save('atomic.npy', new_X, allow_pickle=True)
+np.save('atomic_move_1.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack_1.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell_1.npy', new_X_spl, allow_pickle=True)
+np.save('atomic_1.npy', new_X, allow_pickle=True)
 
 # bar.finish()
 
 # In[3]: Trim data to our need
-X = np.load('atomic.npy', allow_pickle=True)
+X = np.concatenate((np.load('atomic_1.npy', allow_pickle=True), np.load('atomic_2.npy', allow_pickle=True)))
+
 new_X = []
 max_tick = 0
 min_tick = np.inf
@@ -100,6 +101,7 @@ y = []
 
 for inst in X:
     atomic_inst = inst[1]
+    atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 34))
     steam_id = inst[0][0]
     hero_name = inst[0][1]
     if atomic_inst.size < 2000 or atomic_inst.size > 60000:
@@ -108,18 +110,29 @@ for inst in X:
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
 
     if steam_id == 76561198134243802:
-        if hero_name == "CDOTA_Unit_Hero_Puck":
-            y.append(1)
-        else: continue
-    else:
+        # if hero_name == "CDOTA_Unit_Hero_Puck":
+        y.append(1)
+        # else: continue
+    elif steam_id == 76561198078399948:
         y.append(0)
+    else: continue
     new_X.append(atomic_inst)
-med_tick = 25000
+med_tick = 20000
 # new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
 # new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
 new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
 X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.25, random_state=42)
 
+""" snippet to plot sizes
+sizer = []
+for i in new_X:
+    sizer.append(np.shape(i[1])[0])
+import matplotlib.pyplot as plt
+plt.plot(sizer)
+plt.show()
+print(np.median(sizer))
+print(np.mean(sizer))
+"""
 
 # In[2]: Read data and split train and test data
 # from file_names import authentic_match_id
