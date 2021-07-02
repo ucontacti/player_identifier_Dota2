@@ -23,7 +23,7 @@ new_X_spl = []
 # bar = Bar('Processing', max=len(authentic_match_id))
 for match_id in authentic_match_id:
     df_cursor = pd.read_csv("../data_collector/features/" + match_id + "_cursor_tmp.csv")
-    df_unit_order = pd.read_csv("../data_collector/features/" + match_id + "_unit_order.csv")
+    df_unit_order = pd.read_csv("../data_collector/features/" + match_id + "_unit_order_tickless.csv")
     df_unit_order.drop_duplicates(inplace=True)
     df_unit_order.replace({"Action": {'M': 1, 'A': 2, 'S': 3},}, inplace=True)
     df_match_info = pd.read_csv("../data_collector/features/" + match_id + "_info.csv")
@@ -83,15 +83,15 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-np.save('atomic_move_1.npy', new_X_mov, allow_pickle=True)
-np.save('atomic_attack_1.npy', new_X_att, allow_pickle=True)
-np.save('atomic_spell_1.npy', new_X_spl, allow_pickle=True)
-np.save('atomic_1.npy', new_X, allow_pickle=True)
+np.save('atomic_move_tickless_2.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack_tickless_2.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell_tickless_2.npy', new_X_spl, allow_pickle=True)
+np.save('atomic_tickless_2.npy', new_X, allow_pickle=True)
 
 # bar.finish()
 
 # In[3]: Trim data to our need
-X = np.concatenate((np.load('atomic_1.npy', allow_pickle=True), np.load('atomic_2.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_tickless_1.npy', allow_pickle=True), np.load('atomic_tickless_2.npy', allow_pickle=True), np.load('atomic_tickless_3.npy', allow_pickle=True)))
 
 new_X = []
 max_tick = 0
@@ -110,12 +110,13 @@ for inst in X:
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
 
     if steam_id == 76561198134243802:
-        # if hero_name == "CDOTA_Unit_Hero_Puck":
-        y.append(1)
-        # else: continue
-    elif steam_id == 76561198078399948:
+        if hero_name == "CDOTA_Unit_Hero_Puck":
+            y.append(1)
+        else: continue
+    # elif steam_id == 76561198078399948:
+    else:
         y.append(0)
-    else: continue
+    # else: continue
     new_X.append(atomic_inst)
 med_tick = 20000
 # new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
@@ -126,13 +127,57 @@ X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0
 """ snippet to plot sizes
 sizer = []
 for i in new_X:
-    sizer.append(np.shape(i[1])[0])
+    sizer.append(np.shape(i))
 import matplotlib.pyplot as plt
 plt.plot(sizer)
 plt.show()
 print(np.median(sizer))
 print(np.mean(sizer))
 """
+# In[]: Multiclassify labler
+X = np.concatenate((np.load('atomic_tickless_1.npy', allow_pickle=True), np.load('atomic_tickless_2.npy', allow_pickle=True), np.load('atomic_tickless_3.npy', allow_pickle=True)))
+
+steamer = []
+for i in X:
+    steamer.append(str(i[0][0]) + i[0][1])
+steamer = pd.DataFrame(steamer,columns=['steamid'])
+steamer = steamer["steamid"].value_counts()
+
+new_X = []
+max_tick = 0
+min_tick = np.inf
+y = []
+
+
+for inst in X:
+    atomic_inst = inst[1]
+    atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 34))
+    steam_id = inst[0][0]
+    hero_name = inst[0][1]
+    if atomic_inst.size < 2000 or atomic_inst.size > 80000:
+        continue
+    # max_tick = atomic_inst.size if atomic_inst.size > max_tick else max_tick
+    # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
+
+    # if steam_id == 76561198134243802:
+    #     if hero_name == "CDOTA_Unit_Hero_Puck":
+    #         y.append(1)
+    #     else: continue
+    # # elif steam_id == 76561198078399948:
+    # else:
+    #     y.append(0)
+    # # else: continue
+    if steamer[str(steam_id) + hero_name] >= 10:
+        y.append(steam_id)
+    else:
+        continue
+    new_X.append(atomic_inst)
+
+med_tick = 20000
+# new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
+# new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
+new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
+X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.25, random_state=42)
 
 # In[2]: Read data and split train and test data
 # from file_names import authentic_match_id
@@ -204,21 +249,24 @@ def calculate_eer(y_true, y_score):
 # In[4]: Logistic Regression
 from sklearn.linear_model import LogisticRegression
 
-clf = LogisticRegression(random_state=42, max_iter=200).fit(X_train, y_train)
+clf = LogisticRegression(random_state=42, max_iter=200, multi_class="multinomial").fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The macro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
-kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-# print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
-print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
-print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+# # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+# # print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
+# print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
+# print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm.mean()*100,2))
 
 
 # In[5]: Decision Tree
