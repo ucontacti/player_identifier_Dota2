@@ -134,7 +134,7 @@ plt.show()
 print(np.median(sizer))
 print(np.mean(sizer))
 """
-# In[]: Multiclassify labler
+# In[]: Multiclassify labeler
 X = np.concatenate((np.load('atomic_tickless_1.npy', allow_pickle=True), np.load('atomic_tickless_2.npy', allow_pickle=True), np.load('atomic_tickless_3.npy', allow_pickle=True)))
 
 steamer = []
@@ -249,7 +249,7 @@ def calculate_eer(y_true, y_score):
 # In[4]: Logistic Regression
 from sklearn.linear_model import LogisticRegression
 
-clf = LogisticRegression(random_state=42, max_iter=200, multi_class="multinomial").fit(X_train, y_train)
+clf = LogisticRegression(random_state=42, max_iter=200, multi_class="ovr").fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
 print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
@@ -268,6 +268,27 @@ print('The macro f1_score of the Logistic Regression is ', round(f1_score(predic
 # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
 # print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm.mean()*100,2))
 
+# In[4]: Logistic Regression CV
+from sklearn.linear_model import LogisticRegressionCV
+
+clf = LogisticRegressionCV(cv=5, random_state=42, max_iter=200).fit(X_train, y_train)
+prediction_rm=clf.predict(X_test)
+print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
+print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
+# print('The macro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+
+# kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+# # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+# # print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
+# print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
+# print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm.mean()*100,2))
 
 # In[5]: Decision Tree
 from sklearn.tree import DecisionTreeClassifier
