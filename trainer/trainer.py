@@ -23,7 +23,7 @@ new_X_spl = []
 # bar = Bar('Processing', max=len(authentic_match_id))
 for match_id in authentic_match_id:
     df_cursor = pd.read_csv("../data_collector/features/" + match_id + "_cursor_tmp.csv")
-    df_unit_order = pd.read_csv("../data_collector/features/" + match_id + "_unit_order_tickless.csv")
+    df_unit_order = pd.read_csv("../data_collector/features/" + match_id + "_unit_order_v2.csv")
     df_unit_order.drop_duplicates(inplace=True)
     df_unit_order.replace({"Action": {'M': 1, 'A': 2, 'S': 3},}, inplace=True)
     df_match_info = pd.read_csv("../data_collector/features/" + match_id + "_info.csv")
@@ -83,10 +83,10 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-np.save('atomic_move_tickless_2.npy', new_X_mov, allow_pickle=True)
-np.save('atomic_attack_tickless_2.npy', new_X_att, allow_pickle=True)
-np.save('atomic_spell_tickless_2.npy', new_X_spl, allow_pickle=True)
-np.save('atomic_tickless_2.npy', new_X, allow_pickle=True)
+np.save('atomic_move_v2_2.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack_v2_2.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell_v2_2.npy', new_X_spl, allow_pickle=True)
+np.save('atomic_v2_2.npy', new_X, allow_pickle=True)
 
 # bar.finish()
 

@@ -99,6 +99,7 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         switch (message.getOrderType()) {
         case 1: // move action
+        case 2: 
             sb.append(ctx.getTick());
             sb.append(',');
             sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
@@ -107,8 +108,7 @@ public class Main {
             sb.append('\n');
             action_writer.write(sb.toString());
             break;
-        case 2: // attack action
-        case 3:
+        case 3: // attack action
         case 4:
             sb.append(ctx.getTick());
             sb.append(',');
@@ -120,9 +120,7 @@ public class Main {
             break;
         case 5: // cast spell action
         case 6:
-        case 7:
-        case 8:
-        case 9:
+        // case 8:
             sb.append(ctx.getTick());
             sb.append(',');
             sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
@@ -153,7 +151,7 @@ public class Main {
 
     public void run(String[] args) throws Exception {
         String rep_pwd = args[0];
-        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order_tickless.csv";
+        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order_v2.csv";
         
         action_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
