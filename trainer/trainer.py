@@ -33,6 +33,8 @@ for match_id in authentic_match_id:
     for hero in dfs_unit_order:
         steam_id = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["SteamId"]
         hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
+        if (hero_name != "CDOTA_Unit_Hero_StormSpirit"):
+            continue
         hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
         df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
         df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
@@ -50,10 +52,13 @@ for match_id in authentic_match_id:
         df_hero_cursor.fillna({"AoM":0}, inplace=True)
         df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
         df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["Tick"].diff()
+        print("yoyoo1")
         df_hero_cursor["Cur"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["S"].diff()
-        # df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
         # df_hero_cursor.drop("S", axis=0, inplace=True)
+        # df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
+        print("yoyoo2")        
         df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0}, inplace=True)
+        print("yoyoo3")
         atomic_order = df_hero_cursor.groupby("range").agg({
             "Tick": "count", 
             "Action": "first",
@@ -67,6 +72,7 @@ for match_id in authentic_match_id:
             "Cur":["min", "max", "mean", "std"]
             # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
+        print("yoyoo4")
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
         atomic_order_move = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 1].index)
         atomic_order_attack = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 2].index)
@@ -80,13 +86,14 @@ for match_id in authentic_match_id:
         new_X_spl.append(atomic_order_spell_arr)
         new_X.append(atomic_order_arr)
 
+
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-np.save('atomic_move_v2_3.npy', new_X_mov, allow_pickle=True)
-np.save('atomic_attack_v2_3.npy', new_X_att, allow_pickle=True)
-np.save('atomic_spell_v2_3.npy', new_X_spl, allow_pickle=True)
-np.save('atomic_v2_3.npy', new_X, allow_pickle=True)
+# np.save('atomic_move_v2_3.npy', new_X_mov, allow_pickle=True)
+# np.save('atomic_attack_v2_3.npy', new_X_att, allow_pickle=True)
+# np.save('atomic_spell_v2_3.npy', new_X_spl, allow_pickle=True)
+# np.save('atomic_v2_3.npy', new_X, allow_pickle=True)
 
 # bar.finish()
 
