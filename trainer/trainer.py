@@ -33,8 +33,6 @@ for match_id in authentic_match_id:
     for hero in dfs_unit_order:
         steam_id = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["SteamId"]
         hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
-        if (hero_name != "CDOTA_Unit_Hero_StormSpirit"):
-            continue
         hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
         df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
         df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
@@ -52,13 +50,10 @@ for match_id in authentic_match_id:
         df_hero_cursor.fillna({"AoM":0}, inplace=True)
         df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
         df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["Tick"].diff()
-        print("yoyoo1")
         df_hero_cursor["Cur"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["S"].diff()
         # df_hero_cursor.drop("S", axis=0, inplace=True)
         # df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
-        print("yoyoo2")        
         df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0}, inplace=True)
-        print("yoyoo3")
         atomic_order = df_hero_cursor.groupby("range").agg({
             "Tick": "count", 
             "Action": "first",
@@ -72,7 +67,6 @@ for match_id in authentic_match_id:
             "Cur":["min", "max", "mean", "std"]
             # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
-        print("yoyoo4")
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
         atomic_order_move = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 1].index)
         atomic_order_attack = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 2].index)
@@ -90,10 +84,10 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-# np.save('atomic_move_v2_3.npy', new_X_mov, allow_pickle=True)
-# np.save('atomic_attack_v2_3.npy', new_X_att, allow_pickle=True)
-# np.save('atomic_spell_v2_3.npy', new_X_spl, allow_pickle=True)
-# np.save('atomic_v2_3.npy', new_X, allow_pickle=True)
+np.save('atomic_move_v2_7.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack_v2_7.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell_v2_7.npy', new_X_spl, allow_pickle=True)
+np.save('atomic_v2_7.npy', new_X, allow_pickle=True)
 
 # bar.finish()
 
@@ -142,7 +136,7 @@ print(np.median(sizer))
 print(np.mean(sizer))
 """
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), np.load('atomic_v2_2.npy', allow_pickle=True), np.load('atomic_v2_3.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), np.load('atomic_v2_2.npy', allow_pickle=True), np.load('atomic_v2_3.npy', allow_pickle=True), np.load('atomic_v2_4.npy', allow_pickle=True), np.load('atomic_v2_5.npy', allow_pickle=True), np.load('atomic_v2_6.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -174,9 +168,10 @@ for inst in X:
     # else:
     #     y.append(0)
     # # else: continue
-    if steamer[str(steam_id) + hero_name] >= 10:
+    if steamer[str(steam_id) + hero_name] >= 40:
         y.append(steam_id)
     else:
+        # y.append(0)
         continue
     new_X.append(atomic_inst)
 
@@ -259,21 +254,21 @@ from sklearn.linear_model import LogisticRegression
 clf = LogisticRegression(random_state=42, max_iter=200).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
-print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
-print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
-# print('The macro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-# print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-# print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+# print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
+# print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
+# print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The macro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
 kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-# print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
-print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
-print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm.mean()*100,2))
+result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
+# print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
+# print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm.mean()*100,2))
 
 # In[4]: Logistic Regression CV
 from sklearn.linear_model import LogisticRegressionCV
