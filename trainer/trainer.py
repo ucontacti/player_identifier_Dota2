@@ -84,15 +84,15 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-np.save('atomic_move_v2_9.npy', new_X_mov, allow_pickle=True)
-np.save('atomic_attack_v2_9.npy', new_X_att, allow_pickle=True)
-np.save('atomic_spell_v2_9.npy', new_X_spl, allow_pickle=True)
-np.save('atomic_v2_9.npy', new_X, allow_pickle=True)
+np.save('atomic_move_v2_10.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack_v2_10.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell_v2_10.npy', new_X_spl, allow_pickle=True)
+np.save('atomic_v2_10.npy', new_X, allow_pickle=True)
 
 # bar.finish()
 
 # In[3]: Trim data to our need
-X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), np.load('atomic_v2_2.npy', allow_pickle=True), np.load('atomic_v2_3.npy', allow_pickle=True), np.load('atomic_v2_4.npy', allow_pickle=True), np.load('atomic_v2_5.npy', allow_pickle=True), np.load('atomic_v2_6.npy', allow_pickle=True), np.load('atomic_v2_7.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), np.load('atomic_v2_2.npy', allow_pickle=True), np.load('atomic_v2_3.npy', allow_pickle=True), np.load('atomic_v2_4.npy', allow_pickle=True), np.load('atomic_v2_5.npy', allow_pickle=True), np.load('atomic_v2_6.npy', allow_pickle=True), np.load('atomic_v2_7.npy', allow_pickle=True), np.load('atomic_v2_8.npy', allow_pickle=True), np.load('atomic_v2_9.npy', allow_pickle=True)))
 
 new_X = []
 max_tick = 0
@@ -110,11 +110,11 @@ for inst in X:
     # max_tick = atomic_inst.size if atomic_inst.size > max_tick else max_tick
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
 
-    if steam_id == 76561198135593836:
+    if steam_id == 76561198083070947:
         # if hero_name == "CDOTA_Unit_Hero_Dawnbreaker":
-            y.append(1)
+        y.append(1)
         # else: continue
-    elif steam_id == 76561198072826470:
+    elif steam_id == 76561198135593836:
     # else:
         y.append(0)
     else: continue
@@ -136,7 +136,16 @@ print(np.median(sizer))
 print(np.mean(sizer))
 """
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), np.load('atomic_v2_2.npy', allow_pickle=True), np.load('atomic_v2_3.npy', allow_pickle=True), np.load('atomic_v2_4.npy', allow_pickle=True), np.load('atomic_v2_5.npy', allow_pickle=True), np.load('atomic_v2_6.npy', allow_pickle=True), np.load('atomic_v2_7.npy', allow_pickle=True), np.load('atomic_v2_8.npy', allow_pickle=True), np.load('atomic_v2_9.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), 
+                    np.load('atomic_v2_2.npy', allow_pickle=True), 
+                    np.load('atomic_v2_3.npy', allow_pickle=True), 
+                    np.load('atomic_v2_4.npy', allow_pickle=True), 
+                    np.load('atomic_v2_5.npy', allow_pickle=True), 
+                    np.load('atomic_v2_6.npy', allow_pickle=True), 
+                    np.load('atomic_v2_7.npy', allow_pickle=True), 
+                    np.load('atomic_v2_8.npy', allow_pickle=True), 
+                    np.load('atomic_v2_9.npy', allow_pickle=True),
+                    np.load('atomic_v2_10.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -168,7 +177,7 @@ for inst in X:
     # else:
     #     y.append(0)
     # # else: continue
-    if steamer[str(steam_id) + hero_name] >= 40:
+    if steamer[str(steam_id) + hero_name] >= 42:
         # if (str(steam_id) + hero_name == "76561198173337033CDOTA_Unit_Hero_Chen"):
         y.append(steam_id)
             # y.append(1)
@@ -184,6 +193,12 @@ med_tick = 20000
 # new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
 new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
 X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.25, random_state=42)
+"""
+Snippet to see player id games
+for i in steamer.index:
+    if steamer[i] >= 40:
+        print(i + str(steamer[i]))
+"""
 
 # In[2]: Read data and split train and test data
 # from file_names import authentic_match_id
@@ -302,16 +317,16 @@ from sklearn.tree import DecisionTreeClassifier
 clf = DecisionTreeClassifier(random_state=42).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Decision Tree is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-print('The precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-print('The f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Decision Tree is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
-kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
-print('----------------------The cross validated precision score for Decision Tree is:',round(result_rm.mean()*100,2))
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
-print('----------------------The cross validated recall score for Decision Tree is:',round(result_rm.mean()*100,2))
+# kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
+# print('----------------------The cross validated precision score for Decision Tree is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
+# print('----------------------The cross validated recall score for Decision Tree is:',round(result_rm.mean()*100,2))
 
 
 # In[6]: Random Forest
@@ -320,14 +335,14 @@ from sklearn.ensemble import RandomForestClassifier
 clf = RandomForestClassifier(random_state=42).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Random Forest is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-print('The precision of the Random Forest is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-print('The recall of the Random Forest is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-print('The f1_score of the Random Forest is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The precision of the Random Forest is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The recall of the Random Forest is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+# print('The f1_score of the Random Forest is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Random Forest is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
-# kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-# print('----------------------The cross validated score for Random Forest is:',round(result_rm.mean()*100,2))
+kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+print('----------------------The cross validated score for Random Forest is:',round(result_rm.mean()*100,2))
 
 
 # %%
