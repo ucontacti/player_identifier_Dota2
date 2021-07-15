@@ -46,17 +46,21 @@ for match_id in authentic_match_id:
         df_hero_cursor["S"] = np.cumsum(df_hero_cursor["S"])
         df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick"].diff()
-        df_hero_cursor["AoM"] = np.arctan(df_hero_cursor["X"].diff() / df_hero_cursor["Y"].diff())
+        df_hero_cursor["AoM"] = np.arctan(df_hero_cursor["Y"].diff() / df_hero_cursor["X"].diff())
         df_hero_cursor.fillna({"AoM":0}, inplace=True)
         df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
         df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["Cur"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["S"].diff()
+        df_hero_cursor["Y_diff"] = df_hero_cursor["Y"].diff()
+        df_hero_cursor["X_diff"] = df_hero_cursor["X"].diff()
         # df_hero_cursor.drop("S", axis=0, inplace=True)
         # df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
-        df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0}, inplace=True)
+        df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Y_diff":0, "X_diff":0}, inplace=True)
         atomic_order = df_hero_cursor.groupby("range").agg({
             "Tick": "count", 
             "Action": "first",
+            "X_diff": "sum",
+            "Y_diff": "sum",
             "V_X":["min", "max", "mean", "std"], 
             "V_Y":["min", "max", "mean", "std"],
             "V":["min", "max", "mean", "std"],
@@ -67,6 +71,9 @@ for match_id in authentic_match_id:
             "Cur":["min", "max", "mean", "std"]
             # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
+        atomic_order["distance"] = np.sqrt(atomic_order["X_diff"]["sum"]**2 + atomic_order["Y_diff"]["sum"]**2)
+        atomic_order.drop("X_diff", axis=1 ,inplace=True)
+        atomic_order.drop("Y_diff", axis=1 ,inplace=True)
         atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 20].index, inplace = True)
         atomic_order_move = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 1].index)
         atomic_order_attack = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 2].index)
@@ -84,10 +91,10 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-np.save('atomic_move_v2_10.npy', new_X_mov, allow_pickle=True)
-np.save('atomic_attack_v2_10.npy', new_X_att, allow_pickle=True)
-np.save('atomic_spell_v2_10.npy', new_X_spl, allow_pickle=True)
-np.save('atomic_v2_10.npy', new_X, allow_pickle=True)
+np.save('atomic_move_v3_8.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack_v3_8.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell_v3_8.npy', new_X_spl, allow_pickle=True)
+np.save('atomic_v3_8.npy', new_X, allow_pickle=True)
 
 # bar.finish()
 
