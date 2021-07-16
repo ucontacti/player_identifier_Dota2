@@ -1,4 +1,5 @@
 # In[1]: Headerimport
+from operator import mul
 from numpy.lib.function_base import append, average
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score  #for accuracy_score and precision_score
 import numpy as np 
@@ -99,7 +100,16 @@ np.save('atomic_v3_8.npy', new_X, allow_pickle=True)
 # bar.finish()
 
 # In[3]: Trim data to our need
-X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), np.load('atomic_v2_2.npy', allow_pickle=True), np.load('atomic_v2_3.npy', allow_pickle=True), np.load('atomic_v2_4.npy', allow_pickle=True), np.load('atomic_v2_5.npy', allow_pickle=True), np.load('atomic_v2_6.npy', allow_pickle=True), np.load('atomic_v2_7.npy', allow_pickle=True), np.load('atomic_v2_8.npy', allow_pickle=True), np.load('atomic_v2_9.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
+                    np.load('atomic_v3_2.npy', allow_pickle=True), 
+                    np.load('atomic_v3_3.npy', allow_pickle=True), 
+                    np.load('atomic_v3_4.npy', allow_pickle=True), 
+                    np.load('atomic_v3_5.npy', allow_pickle=True), 
+                    np.load('atomic_v3_6.npy', allow_pickle=True), 
+                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
+                    np.load('atomic_v3_8.npy', allow_pickle=True), 
+                    np.load('atomic_v3_9.npy', allow_pickle=True),
+                    np.load('atomic_v3_10.npy', allow_pickle=True)))
 
 new_X = []
 max_tick = 0
@@ -109,22 +119,21 @@ y = []
 
 for inst in X:
     atomic_inst = inst[1]
-    atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 34))
+    atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 35))
     steam_id = inst[0][0]
     hero_name = inst[0][1]
     if atomic_inst.size < 2000 or atomic_inst.size > 80000:
         continue
     # max_tick = atomic_inst.size if atomic_inst.size > max_tick else max_tick
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
-
-    if steam_id == 76561198083070947:
-        # if hero_name == "CDOTA_Unit_Hero_Dawnbreaker":
-        y.append(1)
+    if steam_id == 76561198135593836:
+        # if hero_name == "CDOTA_Unit_Hero_Obsidian_Destroyer":
+            y.append(1)
         # else: continue
-    elif steam_id == 76561198135593836:
-    # else:
+    # elif steam_id == 76561198173337033:
+    else:
         y.append(0)
-    else: continue
+    # else: continue
     new_X.append(atomic_inst)
 med_tick = 20000
 # new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
@@ -143,16 +152,16 @@ print(np.median(sizer))
 print(np.mean(sizer))
 """
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v2_1.npy', allow_pickle=True), 
-                    np.load('atomic_v2_2.npy', allow_pickle=True), 
-                    np.load('atomic_v2_3.npy', allow_pickle=True), 
-                    np.load('atomic_v2_4.npy', allow_pickle=True), 
-                    np.load('atomic_v2_5.npy', allow_pickle=True), 
-                    np.load('atomic_v2_6.npy', allow_pickle=True), 
-                    np.load('atomic_v2_7.npy', allow_pickle=True), 
-                    np.load('atomic_v2_8.npy', allow_pickle=True), 
-                    np.load('atomic_v2_9.npy', allow_pickle=True),
-                    np.load('atomic_v2_10.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
+                    np.load('atomic_v3_2.npy', allow_pickle=True), 
+                    np.load('atomic_v3_3.npy', allow_pickle=True), 
+                    np.load('atomic_v3_4.npy', allow_pickle=True), 
+                    np.load('atomic_v3_5.npy', allow_pickle=True), 
+                    np.load('atomic_v3_6.npy', allow_pickle=True), 
+                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
+                    np.load('atomic_v3_8.npy', allow_pickle=True), 
+                    np.load('atomic_v3_9.npy', allow_pickle=True),
+                    np.load('atomic_v3_10.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -168,7 +177,12 @@ y = []
 
 for inst in X:
     atomic_inst = inst[1]
-    atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 34))
+    atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 35))
+    # low_tick = list(filter(lambda x: atomic_inst[x] < 30, np.arange(0, atomic_inst.size, 34)))
+    # low_tick_index = []
+    # for i in low_tick:
+    #     low_tick_index += list(range(i, i + 34))
+    # atomic_inst = np.delete(atomic_inst, low_tick_index)
     steam_id = inst[0][0]
     hero_name = inst[0][1]
     if atomic_inst.size < 1000 or atomic_inst.size > 80000:
@@ -283,9 +297,9 @@ print('The accuracy of the Logistic Regression is ', round(accuracy_score(predic
 # print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
 # print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
 # print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
-print('The macro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The micro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The micro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The micro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
 kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
@@ -302,12 +316,12 @@ from sklearn.linear_model import LogisticRegressionCV
 clf = LogisticRegressionCV(cv=5, random_state=42, max_iter=200).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-# print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
-# print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
-# print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
-print('The macro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
-print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
-print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
+# print('The macro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
 # kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
@@ -324,14 +338,20 @@ from sklearn.tree import DecisionTreeClassifier
 clf = DecisionTreeClassifier(random_state=42).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Decision Tree is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-# print('The precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-# print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-# print('The f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Decision Tree is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+# print('The macro precision of the Decision Tree is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro recall of the Decision Tree is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro f1_score of the Decision Tree is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
 
-# kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
-# print('----------------------The cross validated precision score for Decision Tree is:',round(result_rm.mean()*100,2))
+
+kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+# print('----------------------The cross validated accuracy score for Decision Tree is:',round(result_rm.mean()*100,2))
+result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
+print('----------------------The cross validated precision score for Decision Tree is:',round(result_rm.mean()*100,2))
 # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
 # print('----------------------The cross validated recall score for Decision Tree is:',round(result_rm.mean()*100,2))
 
@@ -342,14 +362,20 @@ from sklearn.ensemble import RandomForestClassifier
 clf = RandomForestClassifier(random_state=42).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Random Forest is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-# print('The precision of the Random Forest is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-# print('The recall of the Random Forest is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
-# print('The f1_score of the Random Forest is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The precision of the Random Forest is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The recall of the Random Forest is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
+print('The f1_score of the Random Forest is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='binary')*100,2))
 # print('The EER value of the Random Forest is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
+
+# print('The macro precision of the Random Forset is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro recall of the Random Forset is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
+# print('The macro f1_score of the Random Forset is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
 kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-print('----------------------The cross validated score for Random Forest is:',round(result_rm.mean()*100,2))
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+# print('----------------------The cross validated score for Random Forest is:',round(result_rm.mean()*100,2))
+result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
+print('----------------------The cross validated precision score for Random Forest is:',round(result_rm.mean()*100,2))
 
 
 # %%
