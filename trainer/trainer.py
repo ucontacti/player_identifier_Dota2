@@ -126,7 +126,7 @@ for inst in X:
         continue
     # max_tick = atomic_inst.size if atomic_inst.size > max_tick else max_tick
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
-    if steam_id == 76561198135593836:
+    if steam_id == 76561198072826470:
         # if hero_name == "CDOTA_Unit_Hero_Obsidian_Destroyer":
             y.append(1)
         # else: continue
@@ -198,7 +198,7 @@ for inst in X:
     # else:
     #     y.append(0)
     # # else: continue
-    if steamer[str(steam_id) + hero_name] >= 42:
+    if steamer[str(steam_id) + hero_name] >= 5:
         # if (str(steam_id) + hero_name == "76561198173337033CDOTA_Unit_Hero_Chen"):
         y.append(steam_id)
             # y.append(1)
