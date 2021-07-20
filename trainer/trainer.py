@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split #for split the data
 
 from sklearn.model_selection import KFold #for K-fold cross validation
 from sklearn.model_selection import cross_val_score #score evaluation
+from sklearn.model_selection import cross_validate #score evaluation
 
 from progress.bar import Bar
 
@@ -190,22 +191,15 @@ for inst in X:
     # max_tick = atomic_inst.size if atomic_inst.size > max_tick else max_tick
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
 
-    # if steam_id == 76561198134243802:
-    #     if hero_name == "CDOTA_Unit_Hero_Puck":
-    #         y.append(1)
-    #     else: continue
-    # # elif steam_id == 76561198078399948:
-    # else:
-    #     y.append(0)
-    # # else: continue
-    if steamer[str(steam_id) + hero_name] >= 40:
-        # if (str(steam_id) + hero_name == "76561198173337033CDOTA_Unit_Hero_Chen"):
-        y.append(steam_id)
-            # y.append(1)
-        # else:
-            # y.append(0)
+    if steamer[str(steam_id) + hero_name] >= 10:
+        if (str(steam_id) + hero_name == "76561198135593836CDOTA_Unit_Hero_Meepo"):
+            # y.append(steam_id)
+            y.append(1)
+        # elif (str(steam_id) + hero_name == "76561198135593836CDOTA_Unit_Hero_Meepo"):
+        else:
+            y.append(0)
     else:
-        # y.append(0)
+            # y.append(0)
         continue
     new_X.append(atomic_inst)
 
@@ -291,19 +285,20 @@ def calculate_eer(y_true, y_score):
 # In[4]: Logistic Regression
 from sklearn.linear_model import LogisticRegression
 
-clf = LogisticRegression(random_state=42, max_iter=200, class_weight='balanced').fit(X_train, y_train)
+clf = LogisticRegression(random_state=42, max_iter=200).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-# print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
-# print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
-# print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
-print('The micro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-print('The micro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-print('The micro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
+# print('The micro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+# print('The micro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+# print('The micro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
-result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm.mean()*100,2))
+result_rm=cross_validate(clf, new_X_padded, y, cv=5,scoring=['precision', 'recall', 'accuracy', 'f1'])
+# result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
+print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm["test_precision"].mean()*100,2))
 # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
 # print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
 # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
