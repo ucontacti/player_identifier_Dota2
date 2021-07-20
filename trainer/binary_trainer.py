@@ -34,11 +34,13 @@ for i in steamer.index:
 import itertools
 player_perm = list(itertools.permutations(plausible_player, 2))
 
+counter = 1
 result_dict = {}
 result_dict["accuracy"] = []
 result_dict["precision"] = []
 result_dict["recall"] = []
 result_dict["f1"] = []
+
 for perm in player_perm:
     new_X = []
     max_tick = 0
@@ -84,8 +86,26 @@ for perm in player_perm:
     result_dict["precision"].append(round(result_rm["test_precision"].mean()*100,2))
     result_dict["recall"].append(round(result_rm["test_recall"].mean()*100,2))
     result_dict["f1"].append(round(result_rm["test_f1"].mean()*100,2))
+    print("batch " + str(counter) + "/" + str(len(player_perm)))
+    counter += 1
 
 # %%
 import matplotlib.pyplot as plt
-plt.hist(result_dict["accuracy"])
+
+fig, axs = plt.subplots(1, 4, sharey=True, tight_layout=True)
+
+axs[0].hist(result_dict["accuracy"])
+axs[0].set_title('Accuracy')
+axs[0].axis(xmin=0,xmax=100)
+axs[1].hist(result_dict["precision"])
+axs[1].set_title('Precision')
+axs[1].axis(xmin=0,xmax=100)
+axs[2].hist(result_dict["recall"])
+axs[2].set_title('Recall')
+axs[2].axis(xmin=0,xmax=100)
+axs[3].hist(result_dict["f1"])
+axs[3].set_title('F1')
+axs[3].axis(xmin=0,xmax=100)
 plt.show()
+
+# %%
