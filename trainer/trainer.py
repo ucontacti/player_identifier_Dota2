@@ -136,7 +136,7 @@ for inst in X:
         y.append(0)
     # else: continue
     new_X.append(atomic_inst)
-med_tick = 20000
+med_tick = 30000
 # new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
 # new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
 new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
@@ -153,16 +153,16 @@ print(np.median(sizer))
 print(np.mean(sizer))
 """
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
-                    np.load('atomic_v3_2.npy', allow_pickle=True), 
-                    np.load('atomic_v3_3.npy', allow_pickle=True), 
-                    np.load('atomic_v3_4.npy', allow_pickle=True), 
-                    np.load('atomic_v3_5.npy', allow_pickle=True), 
-                    np.load('atomic_v3_6.npy', allow_pickle=True), 
-                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
-                    np.load('atomic_v3_8.npy', allow_pickle=True), 
-                    np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True), 
+                    np.load('atomic_v4_2.npy', allow_pickle=True), 
+                    np.load('atomic_v4_3.npy', allow_pickle=True), 
+                    np.load('atomic_v4_4.npy', allow_pickle=True), 
+                    np.load('atomic_v4_5.npy', allow_pickle=True), 
+                    np.load('atomic_v4_6.npy', allow_pickle=True), 
+                    np.load('atomic_v4_7.npy', allow_pickle=True), 
+                    np.load('atomic_v4_8.npy', allow_pickle=True), 
+                    np.load('atomic_v4_9.npy', allow_pickle=True),
+                    np.load('atomic_v4_10.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -203,7 +203,7 @@ for inst in X:
         continue
     new_X.append(atomic_inst)
 
-med_tick = 20000
+med_tick = 30000
 # new_X_padded  = list(map(lambda x: np.resize(x, min_tick), new_X))
 # new_X_padded  = list(map(lambda x: np.pad(x, (0, max_tick - x.size), 'constant'), new_X))
 new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
@@ -298,7 +298,9 @@ print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_r
 
 result_rm=cross_validate(clf, new_X_padded, y, cv=5,scoring=['precision', 'recall', 'accuracy', 'f1'])
 # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')
-print('----------------------The cross validated accuracy score for Logistic Regression is:',round(result_rm["test_precision"].mean()*100,2))
+print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm["test_precision"].mean()*100,2))
+print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm["test_recall"].mean()*100,2))
+print('----------------------The cross validated f1 score for Logistic Regression is:',round(result_rm["test_f1"].mean()*100,2))
 # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='precision')
 # print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm.mean()*100,2))
 # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='recall')
