@@ -39,7 +39,7 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 10:
+    if steamer[player] >= 25:
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -93,4 +93,4 @@ axs[2].axis(xmin=0,xmax=100)
 axs[3].hist(result_dict["f1"])
 axs[3].set_title('F1')
 axs[3].axis(xmin=0,xmax=100)
-plt.savefig('dt_histo.png')
+plt.savefig('dt_histo_2.png')

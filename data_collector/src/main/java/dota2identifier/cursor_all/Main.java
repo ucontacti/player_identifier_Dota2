@@ -85,7 +85,7 @@ public class Main {
         if (isHero(e)) {
             Integer id = e.getProperty("m_iPlayerID");
             heroHashtbl.put(id, e.getDtClass().getDtName());
-            ent_list.add(e);
+            // ent_list.add(e);
         }     
     }
 
@@ -100,6 +100,7 @@ public class Main {
             Entities entities = ctx.getProcessor(Entities.class);
             StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
             int itemId;
+            
 
             for (Entity et: ent_list)
             {
@@ -107,6 +108,7 @@ public class Main {
                 // {
                 //     log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
                 // }
+
                 if(et.getDtClass().getDtName().equals("CDOTAPlayer"))
                 {
                     if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
@@ -168,6 +170,13 @@ public class Main {
         new SimpleRunner(new MappedFileSource(args[0])).runWith(this);
         long tMatch = System.currentTimeMillis() - tStart;
         log.info("total time taken: {}s", (tMatch) / 1000.0);
+        log.info("yep");
+        
+        for (Entity et: ent_list)
+        {    
+            log.info("entity {}", heroHashtbl.get(et.getProperty("m_iPlayerID")));
+        }        
+        
         mouse_writer.close();
     }
 

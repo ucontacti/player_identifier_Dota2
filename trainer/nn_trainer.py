@@ -49,12 +49,12 @@ for inst in X:
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
 
     if steamer[str(steam_id) + hero_name] >= 10:
-        if (str(steam_id) + hero_name == "76561198162034645CDOTA_Unit_Hero_Dawnbreaker"):
-            # y.append(steam_id)
-            y.append(1)
+        # if (str(steam_id) + hero_name == "76561198162034645CDOTA_Unit_Hero_Dawnbreaker"):
+        y.append(steam_id)
+            # y.append(1)
         # elif (str(steam_id) + hero_name == "76561198135593836CDOTA_Unit_Hero_Meepo"):
-        else:
-            y.append(0)
+        # else:
+            # y.append(0)
     else:
             # y.append(0)
         continue
@@ -85,23 +85,23 @@ for (train_index, test_index) in  skf.split(new_X_padded, y):
     model = Sequential()
     model.add(Dense(50, input_dim=20000, activation='relu'))
     model.add(Dense(50, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
+    # model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(36, activation='sigmoid'))
     # compile the keras model
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', keras.metrics.Precision(), keras.metrics.Recall()])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     # fit the keras model on the dataset
-    model.fit(X_train, y_train, epochs=50, validation_data=(X_test, y_test), batch_size=20)
+    model.fit(X_train, y_train, epochs=50)
     # evaluate the keras model
     # _, accuracy = model.evaluate(X_test, y_test)
     results = model.evaluate(X_test, y_test, batch_size=40)
     ev_accuracy.append(results[1])
-    ev_precision.append(results[2])
-    ev_recall.append(results[3])
-    ev_f1.append(2 * results[2] * results[3] / (results[2] + results[3]))
+    # ev_precision.append(results[2])
+    # ev_recall.append(results[3])
+    # ev_f1.append(2 * results[2] * results[3] / (results[2] + results[3]))
 
-print('----------------------The cross validated accuracy score for Logistic Regression is:',round(sum(ev_accuracy) / len(ev_accuracy)*100,2))
-print('----------------------The cross validated precision score for Logistic Regression is:',round(sum(ev_precision) / len(ev_precision)*100,2))
-print('----------------------The cross validated recall score for Logistic Regression is:',round(sum(ev_recall) / len(ev_recall)*100,2))
-print('----------------------The cross validated f1 score for Logistic Regression is:',round(sum(ev_f1) / len(ev_f1)*100,2))
+    print('----------------------The cross validated accuracy score for Logistic Regression is:',round(sum(ev_accuracy) / len(ev_accuracy)*100,2))
+    # print('----------------------The cross validated precision score for Logistic Regression is:',round(sum(ev_precision) / len(ev_precision)*100,2))
+    # print('----------------------The cross validated recall score for Logistic Regression is:',round(sum(ev_recall) / len(ev_recall)*100,2))
+    # print('----------------------The cross validated f1 score for Logistic Regression is:',round(sum(ev_f1) / len(ev_f1)*100,2))
 
-# print('precision: %.2f' % (accuracy*100))
 # %%
