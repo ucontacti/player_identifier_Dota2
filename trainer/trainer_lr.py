@@ -1,29 +1,25 @@
 # In[1]: Headerimport
 from operator import mul
-from numpy.core.shape_base import block
 from numpy.lib.function_base import append, average
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score  #for accuracy_score and precision_score
 import numpy as np 
 import pandas as pd
 from sklearn.model_selection import train_test_split #for split the data
 
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import KFold #for K-fold cross validation
 from sklearn.model_selection import cross_validate #score evaluation
-from keras.models import Sequential
-from keras.layers import Dense
-import keras
 
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
-                    np.load('atomic_v3_2.npy', allow_pickle=True), 
-                    np.load('atomic_v3_3.npy', allow_pickle=True), 
-                    np.load('atomic_v3_4.npy', allow_pickle=True), 
-                    np.load('atomic_v3_5.npy', allow_pickle=True), 
-                    np.load('atomic_v3_6.npy', allow_pickle=True), 
-                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
-                    np.load('atomic_v3_8.npy', allow_pickle=True), 
-                    np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True), 
+                    np.load('atomic_v4_2.npy', allow_pickle=True), 
+                    np.load('atomic_v4_3.npy', allow_pickle=True), 
+                    np.load('atomic_v4_4.npy', allow_pickle=True), 
+                    np.load('atomic_v4_5.npy', allow_pickle=True), 
+                    np.load('atomic_v4_6.npy', allow_pickle=True), 
+                    np.load('atomic_v4_7.npy', allow_pickle=True), 
+                    np.load('atomic_v4_8.npy', allow_pickle=True), 
+                    np.load('atomic_v4_9.npy', allow_pickle=True),
+                    np.load('atomic_v4_10.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -39,7 +35,7 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 25:
+    if steamer[player] >= 10:
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -61,15 +57,13 @@ for player in steamer.index:
                 continue
             new_X.append(atomic_inst)
 
-        med_tick = 20000
+        med_tick = 30000
         new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
-
         X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.25, random_state=42)
-        # from sklearn.tree import DecisionTreeClassifier
-        # clf = DecisionTreeClassifier(random_state=42).fit(X_train, y_train)
+        from sklearn.linear_model import LogisticRegression
 
-        from sklearn.ensemble import RandomForestClassifier
-        clf = RandomForestClassifier(random_state=42).fit(X_train, y_train)
+        clf = LogisticRegression(random_state=42, max_iter=200).fit(X_train, y_train)
+        prediction_rm=clf.predict(X_test)
         result_rm=cross_validate(clf, new_X_padded, y, cv=5,scoring=['precision', 'recall', 'accuracy', 'f1'])
         result_dict["accuracy"].append(round(result_rm["test_accuracy"].mean()*100,2))
         result_dict["precision"].append(round(result_rm["test_precision"].mean()*100,2))
@@ -95,5 +89,6 @@ axs[2].axis(xmin=0,xmax=100)
 axs[3].hist(result_dict["f1"])
 axs[3].set_title('F1')
 axs[3].axis(xmin=0,xmax=100)
-plt.savefig('rf_histo_2.png')
+plt.savefig('lr_histo_3.png')
 
+# %%

@@ -14,16 +14,16 @@ from keras.layers import Dense
 import keras
 
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
-                    np.load('atomic_v3_2.npy', allow_pickle=True), 
-                    np.load('atomic_v3_3.npy', allow_pickle=True), 
-                    np.load('atomic_v3_4.npy', allow_pickle=True), 
-                    np.load('atomic_v3_5.npy', allow_pickle=True), 
-                    np.load('atomic_v3_6.npy', allow_pickle=True), 
-                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
-                    np.load('atomic_v3_8.npy', allow_pickle=True), 
-                    np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True), 
+                    np.load('atomic_v4_2.npy', allow_pickle=True), 
+                    np.load('atomic_v4_3.npy', allow_pickle=True), 
+                    np.load('atomic_v4_4.npy', allow_pickle=True), 
+                    np.load('atomic_v4_5.npy', allow_pickle=True), 
+                    np.load('atomic_v4_6.npy', allow_pickle=True), 
+                    np.load('atomic_v4_7.npy', allow_pickle=True), 
+                    np.load('atomic_v4_8.npy', allow_pickle=True), 
+                    np.load('atomic_v4_9.npy', allow_pickle=True),
+                    np.load('atomic_v4_10.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -39,7 +39,7 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 25:
+    if steamer[player] >= 10:
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -61,7 +61,7 @@ for player in steamer.index:
                 continue
             new_X.append(atomic_inst)
 
-        med_tick = 20000
+        med_tick = 30000
         new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
 
         y = np.array(y)
@@ -125,4 +125,4 @@ axs[2].axis(xmin=0,xmax=100)
 axs[3].hist(result_dict["f1"])
 axs[3].set_title('F1')
 axs[3].axis(xmin=0,xmax=100)
-plt.savefig('nn_histo_2.png')
+plt.savefig('nn_histo_3.png')
