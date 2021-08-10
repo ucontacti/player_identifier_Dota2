@@ -153,16 +153,16 @@ print(np.median(sizer))
 print(np.mean(sizer))
 """
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True), 
-                    np.load('atomic_v4_2.npy', allow_pickle=True), 
-                    np.load('atomic_v4_3.npy', allow_pickle=True), 
-                    np.load('atomic_v4_4.npy', allow_pickle=True), 
-                    np.load('atomic_v4_5.npy', allow_pickle=True), 
-                    np.load('atomic_v4_6.npy', allow_pickle=True), 
-                    np.load('atomic_v4_7.npy', allow_pickle=True), 
-                    np.load('atomic_v4_8.npy', allow_pickle=True), 
-                    np.load('atomic_v4_9.npy', allow_pickle=True),
-                    np.load('atomic_v4_10.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
+                    np.load('atomic_v3_2.npy', allow_pickle=True), 
+                    np.load('atomic_v3_3.npy', allow_pickle=True), 
+                    np.load('atomic_v3_4.npy', allow_pickle=True), 
+                    np.load('atomic_v3_5.npy', allow_pickle=True), 
+                    np.load('atomic_v3_6.npy', allow_pickle=True), 
+                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
+                    np.load('atomic_v3_8.npy', allow_pickle=True), 
+                    np.load('atomic_v3_9.npy', allow_pickle=True),
+                    np.load('atomic_v3_10.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -192,12 +192,12 @@ for inst in X:
     # min_tick = atomic_inst.size if atomic_inst.size < min_tick else min_tick
 
     if steamer[str(steam_id) + hero_name] >= 10:
-        if (str(steam_id) + hero_name == "76561198135593836CDOTA_Unit_Hero_Meepo"):
-            # y.append(steam_id)
-            y.append(1)
+        # if (str(steam_id) + hero_name == "76561198072826470CDOTA_Unit_Hero_Slark"):
+            y.append(steam_id)
+            # y.append(1)
         # elif (str(steam_id) + hero_name == "76561198135593836CDOTA_Unit_Hero_Meepo"):
-        else:
-            y.append(0)
+        # else:
+            # y.append(0)
     else:
             # y.append(0)
         continue
@@ -213,6 +213,16 @@ Snippet to see player id games
 for i in steamer.index:
     if steamer[i] >= 40:
         print(i + str(steamer[i]))
+"""
+""" 
+Snippet to get specific hero replays
+tmp =[]
+from file_names import authentic_match_id
+for match_id in authentic_match_id:
+    df_match_info = pd.read_csv("../data_collector/features/" + match_id + "_info.csv")
+    if (76561198036729505 in df_match_info["SteamId"].values) and ("CDOTA_Unit_Hero_Enchantress" in df_match_info["Hero"].values):
+        tmp.append(match_id)
+print(tmp)
 """
 
 # In[2]: Read data and split train and test data
@@ -288,12 +298,12 @@ from sklearn.linear_model import LogisticRegression
 clf = LogisticRegression(random_state=42, max_iter=200).fit(X_train, y_train)
 prediction_rm=clf.predict(X_test)
 print('The accuracy of the Logistic Regression is ', round(accuracy_score(prediction_rm, y_test)*100,2))
-print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
-print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
-print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
-# print('The micro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-# print('The micro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
-# print('The micro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+# print('The precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1)*100,2))
+# print('The recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1)*100,2))
+# print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1)*100,2))
+print('The micro precision of the Logistic Regression is ', round(precision_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The micro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
+print('The micro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='micro')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
 
 result_rm=cross_validate(clf, new_X_padded, y, cv=5,scoring=['precision', 'recall', 'accuracy', 'f1'])
