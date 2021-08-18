@@ -39,7 +39,7 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 80:
+    if steamer[player] >= 0:
         new_X = []
         max_tick = 0
         min_tick = np.inf

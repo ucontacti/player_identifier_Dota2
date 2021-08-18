@@ -35,7 +35,7 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 10:
+    if steamer[player] >= 40:
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -52,7 +52,7 @@ for player in steamer.index:
             
             steam_id = inst[0][0]
             hero_name = inst[0][1]
-            if steamer[str(steam_id) + hero_name] >= 10:
+            if steamer[str(steam_id) + hero_name] >= 15:
                 if (str(steam_id) + hero_name == player):
                     y.append(1)
                 else:
@@ -79,18 +79,18 @@ import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(1, 4, sharey=True, tight_layout=True)
 
-axs[0].hist(result_dict["accuracy"])
+axs[0].hist(result_dict["accuracy"], density=True)
 axs[0].set_title('Accuracy')
 axs[0].axis(xmin=0,xmax=100)
-axs[1].hist(result_dict["precision"])
+axs[1].hist(result_dict["precision"], density=True)
 axs[1].set_title('Precision')
 axs[1].axis(xmin=0,xmax=100)
-axs[2].hist(result_dict["recall"])
+axs[2].hist(result_dict["recall"], density=True)
 axs[2].set_title('Recall')
 axs[2].axis(xmin=0,xmax=100)
-axs[3].hist(result_dict["f1"])
+axs[3].hist(result_dict["f1"], density=True)
 axs[3].set_title('F1')
 axs[3].axis(xmin=0,xmax=100)
-plt.savefig('lr_histo_4.png')
+plt.savefig('lr_histo_5.png')
 
 # %%
