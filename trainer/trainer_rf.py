@@ -39,7 +39,7 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 50:
+    if steamer[player] >= 40:
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -56,7 +56,7 @@ for player in steamer.index:
             
             steam_id = inst[0][0]
             hero_name = inst[0][1]
-            if steamer[str(steam_id) + hero_name] >= 10:
+            if steamer[str(steam_id) + hero_name] >= 15:
                 if (str(steam_id) + hero_name == player):
                     y.append(1)
                 else:
