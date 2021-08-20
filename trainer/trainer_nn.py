@@ -11,6 +11,8 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_validate #score evaluation
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.layers import Dropout
+from keras.constraints import maxnorm
 import keras
 
 # In[]: Multiclassify labeler
@@ -39,7 +41,7 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 0:
+    if steamer[player] >= 40:
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -48,21 +50,21 @@ for player in steamer.index:
         for inst in X:
             atomic_inst = inst[1]
             atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 35))
+            atomic_arr = []
+            for i in range(34):
+                atomic_arr.append(np.mean(atomic_inst[np.arange(i, atomic_inst.size, 34)]))
+            atomic_arr = np.array(atomic_arr)
+            atomic_arr = np.nan_to_num(atomic_arr, nan=0, posinf=0, neginf=0)
             steam_id = inst[0][0]
             hero_name = inst[0][1]
-            if atomic_inst.size < 1000 or atomic_inst.size > 80000:
-                continue
-            if steamer[str(steam_id) + hero_name] >= 10:
+            if steamer[str(steam_id) + hero_name] >= 15:
                 if (str(steam_id) + hero_name == player):
                     y.append(1)
                 else:
                     y.append(0)
             else:
                 continue
-            new_X.append(atomic_inst)
-
-        med_tick = 20000
-        new_X_padded  = list(map(lambda x: np.resize(x, med_tick) if np.size(x) >= med_tick else np.pad(x, (0, med_tick - x.size), 'constant'), new_X))
+            new_X.append(atomic_arr)
 
         y = np.array(y)
 
@@ -71,14 +73,16 @@ for player in steamer.index:
         ev_recall = []
         ev_f1 = []
         skf = StratifiedKFold(n_splits=5, shuffle=False)
-        for (train_index, test_index) in  skf.split(new_X_padded, y):
+        for (train_index, test_index) in  skf.split(new_X, y):
 
-            X_train, X_test = np.array(new_X_padded)[train_index.astype(int)], np.array(new_X_padded)[test_index.astype(int)]
+            X_train, X_test = np.array(new_X)[train_index.astype(int)], np.array(new_X)[test_index.astype(int)]
             y_train, y_test = np.array(y)[train_index.astype(int)], np.array(y)[test_index.astype(int)]
 
             model = Sequential()
-            model.add(Dense(50, input_dim=20000, activation='relu'))
-            model.add(Dense(50, activation='relu'))
+            model.add(Dense(50, input_dim=34, activation='relu', kernel_constraint=maxnorm(3)))
+            model.add(Dropout(0.25))
+            model.add(Dense(50, activation='relu', kernel_constraint=maxnorm(3)))
+            model.add(Dropout(0.25))
             model.add(Dense(1, activation='sigmoid'))
             # compile the keras model
             model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', keras.metrics.Precision(), keras.metrics.Recall()])
@@ -95,12 +99,6 @@ for player in steamer.index:
             else:
                 ev_f1.append(2 * results[2] * results[3] / (results[2] + results[3]))
 
-        # X_train, X_test, y_train, y_test = train_test_split(new_X_padded, y, test_size=0.25, random_state=42)
-        # from sklearn.linear_model import LogisticRegression
-
-        # clf = LogisticRegression(random_state=42, max_iter=200).fit(X_train, y_train)
-        # prediction_rm=clf.predict(X_test)
-        # result_rm=cross_validate(clf, new_X_padded, y, cv=5,scoring=['precision', 'recall', 'accuracy', 'f1'])
         result_dict["accuracy"].append(round(sum(ev_accuracy) / len(ev_accuracy)*100,2))
         result_dict["precision"].append(round(sum(ev_precision) / len(ev_precision)*100,2))
         result_dict["recall"].append(round(sum(ev_recall) / len(ev_recall)*100,2))
@@ -113,16 +111,18 @@ import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(1, 4, sharey=True, tight_layout=True)
 
-axs[0].hist(result_dict["accuracy"])
+axs[0].hist(result_dict["accuracy"], density=True)
 axs[0].set_title('Accuracy')
 axs[0].axis(xmin=0,xmax=100)
-axs[1].hist(result_dict["precision"])
+axs[1].hist(result_dict["precision"], density=True)
 axs[1].set_title('Precision')
 axs[1].axis(xmin=0,xmax=100)
-axs[2].hist(result_dict["recall"])
+axs[2].hist(result_dict["recall"], density=True)
 axs[2].set_title('Recall')
 axs[2].axis(xmin=0,xmax=100)
-axs[3].hist(result_dict["f1"])
+axs[3].hist(result_dict["f1"], density=True)
 axs[3].set_title('F1')
 axs[3].axis(xmin=0,xmax=100)
-plt.savefig('nn_histo_4.png')
+plt.savefig('nn_histo_5.png')
+
+# %%
