@@ -170,13 +170,7 @@ public class Main {
         new SimpleRunner(new MappedFileSource(args[0])).runWith(this);
         long tMatch = System.currentTimeMillis() - tStart;
         log.info("total time taken: {}s", (tMatch) / 1000.0);
-        log.info("yep");
-        
-        for (Entity et: ent_list)
-        {    
-            log.info("entity {}", heroHashtbl.get(et.getProperty("m_iPlayerID")));
-        }        
-        
+                
         mouse_writer.close();
     }
 

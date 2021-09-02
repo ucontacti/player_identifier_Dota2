@@ -1,6 +1,3 @@
 #!/bin/sh
-python3 trainer_binary.py
-python3 trainer_dt.py
-python3 trainer_lr.py
-python3 trainer_nn.py
-python3 trainer_rf.py
+python3 tmp_trainer_1.py
+python3 tmp_trainer_2.py
