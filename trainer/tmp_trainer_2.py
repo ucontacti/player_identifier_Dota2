@@ -91,7 +91,7 @@ for match_id in authentic_match_id:
     # bar.next()
     print("batch " + str(counter) + "/" + str(len(authentic_match_id)))
     counter += 1
-np.save('atomic_move_v3_13.npy', new_X_mov, allow_pickle=True)
-np.save('atomic_attack_v3_13.npy', new_X_att, allow_pickle=True)
-np.save('atomic_spell_v3_13.npy', new_X_spl, allow_pickle=True)
-np.save('atomic_v3_13.npy', new_X, allow_pickle=True)
+np.save('atomic_move_v3_14.npy', new_X_mov, allow_pickle=True)
+np.save('atomic_attack_v3_14.npy', new_X_att, allow_pickle=True)
+np.save('atomic_spell_v3_14.npy', new_X_spl, allow_pickle=True)
+np.save('atomic_v3_14.npy', new_X, allow_pickle=True)
