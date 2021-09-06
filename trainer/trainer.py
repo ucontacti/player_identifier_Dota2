@@ -203,7 +203,11 @@ X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True),
                     # np.load('atomic_v3_7.npy', allow_pickle=True), 
                     np.load('atomic_v3_8.npy', allow_pickle=True), 
                     np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True)))
+                    np.load('atomic_v3_10.npy', allow_pickle=True),
+                    np.load('atomic_v3_11.npy', allow_pickle=True),
+                    np.load('atomic_v3_12.npy', allow_pickle=True),
+                    np.load('atomic_v3_13.npy', allow_pickle=True),
+                    np.load('atomic_v3_14.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -219,16 +223,27 @@ y = []
 
 for inst in X:
     atomic_inst = inst[1]
+    if (atomic_inst.size == 0):
+        continue
     atomic_inst = np.delete(atomic_inst, np.arange(1, atomic_inst.size, 35))
     atomic_arr = []
-    for i in range(34):
-        atomic_arr.append(np.mean(atomic_inst[np.arange(i, atomic_inst.size, 34)]))
+    atomic_arr.append(np.mean(atomic_inst[np.arange(0, atomic_inst.size, 34)]))
+    for i in range(1,33):
+        if (i%4 == 1):
+            atomic_arr.append(np.min(atomic_inst[np.arange(i, atomic_inst.size, 34)]))
+        elif (i%4 == 2):
+            atomic_arr.append(np.max(atomic_inst[np.arange(i, atomic_inst.size, 34)]))
+        elif (i%4 == 3):
+            atomic_arr.append(np.mean(atomic_inst[np.arange(i, atomic_inst.size, 34)]))
+        elif (i%4 == 0):
+            atomic_arr.append(np.std(atomic_inst[np.arange(i, atomic_inst.size, 34)]))
+    atomic_arr.append(np.mean(atomic_inst[np.arange(33, atomic_inst.size, 34)]))        
     atomic_arr = np.array(atomic_arr)
     atomic_arr = np.nan_to_num(atomic_arr, nan=0, posinf=0, neginf=0)
     steam_id = inst[0][0]
     hero_name = inst[0][1]
     if steamer[str(steam_id) + hero_name] >= 10:
-        if (str(steam_id) + hero_name == "76561198060416034CDOTA_Unit_Hero_Lina"):
+        if (str(steam_id) + hero_name == "76561198162034645CDOTA_Unit_Hero_Dawnbreaker"):
             y.append(1)
         # elif (str(steam_id) + hero_name == "76561198135593836CDOTA_Unit_Hero_Meepo"):
         else:
@@ -466,6 +481,11 @@ print('The f1_score of the Logistic Regression is ', round(f1_score(prediction_r
 # print('The macro recall of the Logistic Regression is ', round(recall_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
 # print('The macro f1_score of the Logistic Regression is ', round(f1_score(prediction_rm, y_test, pos_label=1, average='macro')*100,2))
 # print('The EER value of the Logistic Regression is ', round(calculate_eer(prediction_rm, y_test)*100,2))
+result_rm=cross_validate(clf, new_X, y, cv=5,scoring=['precision', 'recall', 'accuracy', 'f1'])
+# result_rm=cross_val_score(clf, new_X, y, cv=5,scoring='accuracy')
+print('----------------------The cross validated precision score for Logistic Regression is:',round(result_rm["test_precision"].mean()*100,2))
+print('----------------------The cross validated recall score for Logistic Regression is:',round(result_rm["test_recall"].mean()*100,2))
+print('----------------------The cross validated f1 score for Logistic Regression is:',round(result_rm["test_f1"].mean()*100,2))
 
 # kfold = KFold(n_splits=5) # k=5, split the data into 5 equal parts
 # # result_rm=cross_val_score(clf, new_X_padded, y, cv=5,scoring='accuracy')

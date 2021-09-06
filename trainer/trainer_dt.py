@@ -23,7 +23,11 @@ X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True),
                     # np.load('atomic_v3_7.npy', allow_pickle=True), 
                     np.load('atomic_v3_8.npy', allow_pickle=True), 
                     np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True)))
+                    np.load('atomic_v3_10.npy', allow_pickle=True),
+                    np.load('atomic_v3_11.npy', allow_pickle=True),
+                    np.load('atomic_v3_12.npy', allow_pickle=True),
+                    np.load('atomic_v3_13.npy', allow_pickle=True),
+                    np.load('atomic_v3_14.npy', allow_pickle=True)))
 
 
 steamer = []
@@ -31,7 +35,7 @@ for i in X:
     steamer.append(str(i[0][0]) + i[0][1])
 steamer = pd.DataFrame(steamer,columns=['steamid'])
 steamer = steamer["steamid"].value_counts()
-
+result_values = steamer
 result_dict = {}
 result_dict["accuracy"] = []
 result_dict["precision"] = []
@@ -80,6 +84,7 @@ for player in steamer.index:
         result_dict["precision"].append(round(result_rm["test_precision"].mean()*100,2))
         result_dict["recall"].append(round(result_rm["test_recall"].mean()*100,2))
         result_dict["f1"].append(round(result_rm["test_f1"].mean()*100,2))
+        result_values[str(steam_id) + hero_name] = round(result_rm["test_f1"].mean()*100,2)
         print("batch " + str(counter))
         counter += 1
 
@@ -100,5 +105,5 @@ axs[2].axis(xmin=0,xmax=100)
 axs[3].hist(result_dict["f1"], density=True)
 axs[3].set_title('F1')
 axs[3].axis(xmin=0,xmax=100)
-plt.savefig('dt_histo_5.png')
+plt.savefig('dt_histo_6.png')
 # %%
