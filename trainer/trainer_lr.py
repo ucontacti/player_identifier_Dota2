@@ -30,7 +30,7 @@ for i in X:
     steamer.append(str(i[0][0]) + i[0][1])
 steamer = pd.DataFrame(steamer,columns=['steamid'])
 steamer = steamer["steamid"].value_counts()
-result_values = steamer
+result_values = {}
 result_dict = {}
 result_dict["accuracy"] = []
 result_dict["precision"] = []
@@ -86,7 +86,7 @@ for player in steamer.index:
         result_dict["precision"].append(round(result_rm["test_precision"].mean()*100,2))
         result_dict["recall"].append(round(result_rm["test_recall"].mean()*100,2))
         result_dict["f1"].append(round(result_rm["test_f1"].mean()*100,2))
-        result_values[str(steam_id) + hero_name] = round(result_rm["test_f1"].mean()*100,2)
+        result_values[player] = round(result_rm["test_f1"].mean()*100,2)
         print("batch " + str(counter))
         counter += 1
 
