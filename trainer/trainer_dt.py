@@ -72,8 +72,6 @@ for player in steamer.index:
             
             steam_id = inst[0][0]
             hero_name = inst[0][1]
-            if atomic_inst.size < 1000 or atomic_inst.size > 80000:
-                continue
             if steamer[str(steam_id) + hero_name] >= 15:
                 if (str(steam_id) + hero_name == player):
                     y.append(1)

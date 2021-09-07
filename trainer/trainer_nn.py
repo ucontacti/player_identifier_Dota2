@@ -12,8 +12,11 @@ from sklearn.model_selection import cross_validate #score evaluation
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
+from keras.layers import Activation
 from keras.constraints import maxnorm
 import keras
+from keras.layers.normalization import BatchNormalization
+
 
 # In[]: Multiclassify labeler
 X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
@@ -25,7 +28,11 @@ X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True),
                     # np.load('atomic_v3_7.npy', allow_pickle=True), 
                     np.load('atomic_v3_8.npy', allow_pickle=True), 
                     np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True)))
+                    np.load('atomic_v3_10.npy', allow_pickle=True),
+                    np.load('atomic_v3_11.npy', allow_pickle=True),
+                    np.load('atomic_v3_12.npy', allow_pickle=True),
+                    np.load('atomic_v3_13.npy', allow_pickle=True),
+                    np.load('atomic_v3_14.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -41,7 +48,10 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 40:
+    if steamer[player] >= 70:
+        if player == "76561198135593836CDOTA_Unit_Hero_Meepo":
+            continue
+        print("Yo!")
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -79,10 +89,12 @@ for player in steamer.index:
             y_train, y_test = np.array(y)[train_index.astype(int)], np.array(y)[test_index.astype(int)]
 
             model = Sequential()
-            model.add(Dense(50, input_dim=34, activation='relu', kernel_constraint=maxnorm(3)))
-            model.add(Dropout(0.25))
-            model.add(Dense(50, activation='relu', kernel_constraint=maxnorm(3)))
-            model.add(Dropout(0.25))
+            # model.add(Dense(50, input_dim=34, activation='relu', kernel_constraint=maxnorm(3)))
+            model.add(Dense(50, input_dim=34, activation='relu'))
+            # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
+            # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
+            # model.add(Dense(100, activation='relu'))
+            # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
             model.add(Dense(1, activation='sigmoid'))
             # compile the keras model
             model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', keras.metrics.Precision(), keras.metrics.Recall()])
@@ -106,7 +118,6 @@ for player in steamer.index:
         print("batch " + str(counter))
         counter += 1
 
-# %%
 import matplotlib.pyplot as plt
 
 fig, axs = plt.subplots(1, 4, sharey=True, tight_layout=True)
@@ -124,5 +135,6 @@ axs[3].hist(result_dict["f1"], density=True)
 axs[3].set_title('F1')
 axs[3].axis(xmin=0,xmax=100)
 plt.savefig('nn_histo_5.png')
+
 
 # %%
