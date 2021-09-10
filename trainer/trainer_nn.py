@@ -19,20 +19,20 @@ from keras.layers.normalization import BatchNormalization
 
 
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
-                    np.load('atomic_v3_2.npy', allow_pickle=True), 
-                    np.load('atomic_v3_3.npy', allow_pickle=True), 
-                    np.load('atomic_v3_4.npy', allow_pickle=True), 
-                    np.load('atomic_v3_5.npy', allow_pickle=True), 
-                    np.load('atomic_v3_6.npy', allow_pickle=True), 
-                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
-                    np.load('atomic_v3_8.npy', allow_pickle=True), 
-                    np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True),
-                    np.load('atomic_v3_11.npy', allow_pickle=True),
-                    np.load('atomic_v3_12.npy', allow_pickle=True),
-                    np.load('atomic_v3_13.npy', allow_pickle=True),
-                    np.load('atomic_v3_14.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True), 
+                    np.load('atomic_v4_2.npy', allow_pickle=True), 
+                    np.load('atomic_v4_3.npy', allow_pickle=True), 
+                    np.load('atomic_v4_4.npy', allow_pickle=True), 
+                    np.load('atomic_v4_5.npy', allow_pickle=True), 
+                    np.load('atomic_v4_6.npy', allow_pickle=True), 
+                    # np.load('atomic_v4_7.npy', allow_pickle=True), 
+                    np.load('atomic_v4_8.npy', allow_pickle=True), 
+                    np.load('atomic_v4_9.npy', allow_pickle=True),
+                    np.load('atomic_v4_10.npy', allow_pickle=True)))
+                    # np.load('atomic_v4_11.npy', allow_pickle=True),
+                    # np.load('atomic_v4_12.npy', allow_pickle=True),
+                    # np.load('atomic_v4_13.npy', allow_pickle=True),
+                    # np.load('atomic_v4_14.npy', allow_pickle=True)))
 
 steamer = []
 for i in X:
@@ -48,10 +48,10 @@ result_dict["f1"] = []
 counter = 1
 
 for player in steamer.index:
-    if steamer[player] >= 70:
-        if player == "76561198135593836CDOTA_Unit_Hero_Meepo":
-            continue
-        print("Yo!")
+    if steamer[player] >= 40:
+        # if player == "76561198135593836CDOTA_Unit_Hero_Meepo":
+            # continue
+        # print("Yo!")
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -90,10 +90,10 @@ for player in steamer.index:
 
             model = Sequential()
             # model.add(Dense(50, input_dim=34, activation='relu', kernel_constraint=maxnorm(3)))
-            model.add(Dense(50, input_dim=34, activation='relu'))
+            model.add(Dense(10, input_dim=34, activation='relu'))
             # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
             # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
-            # model.add(Dense(100, activation='relu'))
+            model.add(Dense(10, activation='relu'))
             # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
             model.add(Dense(1, activation='sigmoid'))
             # compile the keras model

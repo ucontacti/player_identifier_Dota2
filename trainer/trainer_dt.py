@@ -14,20 +14,20 @@ from keras.layers import Dense
 import keras
 
 # In[]: Multiclassify labeler
-X = np.concatenate((np.load('atomic_v3_1.npy', allow_pickle=True), 
-                    np.load('atomic_v3_2.npy', allow_pickle=True), 
-                    np.load('atomic_v3_3.npy', allow_pickle=True), 
-                    np.load('atomic_v3_4.npy', allow_pickle=True), 
-                    np.load('atomic_v3_5.npy', allow_pickle=True), 
-                    np.load('atomic_v3_6.npy', allow_pickle=True), 
-                    # np.load('atomic_v3_7.npy', allow_pickle=True), 
-                    np.load('atomic_v3_8.npy', allow_pickle=True), 
-                    np.load('atomic_v3_9.npy', allow_pickle=True),
-                    np.load('atomic_v3_10.npy', allow_pickle=True),
-                    np.load('atomic_v3_11.npy', allow_pickle=True),
-                    np.load('atomic_v3_12.npy', allow_pickle=True),
-                    np.load('atomic_v3_13.npy', allow_pickle=True),
-                    np.load('atomic_v3_14.npy', allow_pickle=True)))
+X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True), 
+                    np.load('atomic_v4_2.npy', allow_pickle=True), 
+                    np.load('atomic_v4_3.npy', allow_pickle=True), 
+                    np.load('atomic_v4_4.npy', allow_pickle=True), 
+                    np.load('atomic_v4_5.npy', allow_pickle=True), 
+                    np.load('atomic_v4_6.npy', allow_pickle=True), 
+                    # np.load('atomic_v4_7.npy', allow_pickle=True), 
+                    np.load('atomic_v4_8.npy', allow_pickle=True), 
+                    np.load('atomic_v4_9.npy', allow_pickle=True),
+                    np.load('atomic_v4_10.npy', allow_pickle=True)))
+                    # np.load('atomic_v4_11.npy', allow_pickle=True),
+                    # np.load('atomic_v4_12.npy', allow_pickle=True),
+                    # np.load('atomic_v4_13.npy', allow_pickle=True),
+                    # np.load('atomic_v4_14.npy', allow_pickle=True)))
 
 
 steamer = []
@@ -72,7 +72,7 @@ for player in steamer.index:
             
             steam_id = inst[0][0]
             hero_name = inst[0][1]
-            if steamer[str(steam_id) + hero_name] >= 15:
+            if steamer[str(steam_id) + hero_name] >= 40:
                 if (str(steam_id) + hero_name == player):
                     y.append(1)
                 else:
