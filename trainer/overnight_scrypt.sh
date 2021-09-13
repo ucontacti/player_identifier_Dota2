@@ -1,6 +1,7 @@
 #!/bin/sh
-python3 trainer_lr.py
-python3 trainer_rf.py
-python3 trainer_dt.py
+python3 tmp_trainer_1.py
+python3 tmp_trainer_2.py
+python3 tmp_trainer_3.py
+python3 tmp_trainer_4.py
 
 # shutdown now
