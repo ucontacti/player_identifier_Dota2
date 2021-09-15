@@ -25,14 +25,16 @@ X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True),
                     np.load('atomic_v4_4.npy', allow_pickle=True), 
                     np.load('atomic_v4_5.npy', allow_pickle=True), 
                     np.load('atomic_v4_6.npy', allow_pickle=True), 
-                    # np.load('atomic_v4_7.npy', allow_pickle=True), 
+                    np.load('atomic_v4_7.npy', allow_pickle=True), 
                     np.load('atomic_v4_8.npy', allow_pickle=True), 
                     np.load('atomic_v4_9.npy', allow_pickle=True),
-                    np.load('atomic_v4_10.npy', allow_pickle=True)))
-                    # np.load('atomic_v4_11.npy', allow_pickle=True),
-                    # np.load('atomic_v4_12.npy', allow_pickle=True),
-                    # np.load('atomic_v4_13.npy', allow_pickle=True),
-                    # np.load('atomic_v4_14.npy', allow_pickle=True)))
+                    np.load('atomic_v4_10.npy', allow_pickle=True),
+                    np.load('atomic_v4_11.npy', allow_pickle=True),
+                    np.load('atomic_v4_12.npy', allow_pickle=True),
+                    np.load('atomic_v4_13.npy', allow_pickle=True),
+                    np.load('atomic_v4_14.npy', allow_pickle=True),
+                    np.load('atomic_v4_15.npy', allow_pickle=True)))
+
 
 steamer = []
 for i in X:
@@ -49,9 +51,6 @@ counter = 1
 
 for player in steamer.index:
     if steamer[player] >= 40:
-        # if player == "76561198135593836CDOTA_Unit_Hero_Meepo":
-            # continue
-        # print("Yo!")
         new_X = []
         max_tick = 0
         min_tick = np.inf
@@ -90,19 +89,20 @@ for player in steamer.index:
 
             model = Sequential()
             # model.add(Dense(50, input_dim=34, activation='relu', kernel_constraint=maxnorm(3)))
-            model.add(Dense(10, input_dim=34, activation='relu'))
+            model.add(Dense(50, input_dim=34, activation='relu'))
             # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
             # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
-            model.add(Dense(10, activation='relu'))
+            model.add(Dense(50, activation='relu'))
+            model.add(Dense(50, activation='relu'))
             # model.add(Dense(100, activation='relu', kernel_constraint=maxnorm(3)))
             model.add(Dense(1, activation='sigmoid'))
             # compile the keras model
             model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy', keras.metrics.Precision(), keras.metrics.Recall()])
             # fit the keras model on the dataset
-            model.fit(X_train, y_train, epochs=50, validation_data=(X_test, y_test), batch_size=20)
+            model.fit(X_train, y_train, epochs=100, validation_data=(X_test, y_test), batch_size=20)
             # evaluate the keras model
             # _, accuracy = model.evaluate(X_test, y_test)
-            results = model.evaluate(X_test, y_test, batch_size=40)
+            results = model.evaluate(X_test, y_test, batch_size=100)
             ev_accuracy.append(results[1])
             ev_precision.append(results[2])
             ev_recall.append(results[3])

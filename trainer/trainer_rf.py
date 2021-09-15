@@ -20,13 +20,13 @@ X = np.concatenate((np.load('atomic_v4_1.npy', allow_pickle=True),
                     np.load('atomic_v4_4.npy', allow_pickle=True), 
                     np.load('atomic_v4_5.npy', allow_pickle=True), 
                     np.load('atomic_v4_6.npy', allow_pickle=True), 
-                    # np.load('atomic_v4_7.npy', allow_pickle=True), 
+                    np.load('atomic_v4_7.npy', allow_pickle=True), 
                     np.load('atomic_v4_8.npy', allow_pickle=True), 
                     np.load('atomic_v4_9.npy', allow_pickle=True),
-                    np.load('atomic_v4_10.npy', allow_pickle=True)))
-                    # np.load('atomic_v4_11.npy', allow_pickle=True),
-                    # np.load('atomic_v4_12.npy', allow_pickle=True),
-                    # np.load('atomic_v4_13.npy', allow_pickle=True),
+                    np.load('atomic_v4_10.npy', allow_pickle=True),
+                    np.load('atomic_v4_11.npy', allow_pickle=True),
+                    np.load('atomic_v4_12.npy', allow_pickle=True),
+                    np.load('atomic_v4_13.npy', allow_pickle=True)))
                     # np.load('atomic_v4_14.npy', allow_pickle=True)))
 steamer = []
 for i in X:
