@@ -4,6 +4,7 @@ import time
 import datetime
 import os.path
 import pandas as pd
+from replay_downloader import replay_download
 
 REPLAY_TRACKER_PATH = "automation/replay_tracker.csv"
 PLAYER_ID_PATH = "automation/player_id.txt"
@@ -59,11 +60,20 @@ def add_to_replay_tracker():
 def create_empty_replay_tracker():
     pd.DataFrame(columns=['player_id', 'player_64_id', 'replay_id', 'hero', 'state','click_rate']).to_csv(REPLAY_TRACKER_PATH, index=False)
 
+def update_replay_tracker():
+    replay_tracker = pd.read_csv(REPLAY_TRACKER_PATH)
+    new_val = replay_download(replay_tracker.loc[(replay_tracker['state'] == 0), 'replay_id'].tolist())
+    replay_tracker.loc[(replay_tracker['state'] == 0),'state'] = new_val
+    new_val = feature_extractor(replay_tracker.loc[(replay_tracker['state'] == 1), 'replay_id'].tolist())
+    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
+
 if __name__ == "__main__":
     # hero, replay_list = list_replay_by_match_id(sys.argv[1])    
     # print(get_steam64_from_steam32(sys.argv[1]))
     if os.path.isfile(REPLAY_TRACKER_PATH):
-        add_to_replay_tracker()
+        # add_to_replay_tracker()
+        update_replay_tracker()
     else:
         create_empty_replay_tracker()
-        add_to_replay_tracker()
+        # add_to_replay_tracker()
+        update_replay_tracker()
