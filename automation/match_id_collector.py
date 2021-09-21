@@ -83,12 +83,10 @@ def update_replay_tracker():
     replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
 if __name__ == "__main__":
-    # hero, replay_list = list_replay_by_match_id(sys.argv[1])    
-    # print(get_steam64_from_steam32(sys.argv[1]))
     if os.path.isfile(REPLAY_TRACKER_PATH):
-        # add_to_replay_tracker()
+        add_to_replay_tracker()
         update_replay_tracker()
     else:
         create_empty_replay_tracker()
-        # add_to_replay_tracker()
+        add_to_replay_tracker()
         update_replay_tracker()
