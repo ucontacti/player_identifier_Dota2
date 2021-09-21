@@ -1,3 +1,4 @@
+from typing import Counter
 import requests
 import sys
 import time
@@ -6,9 +7,9 @@ import os.path
 import pandas as pd
 from replay_downloader import replay_download
 from feature_extractor import replay_decompress, game_info, unit_order, cursor_data
-
+import time
 REPLAY_TRACKER_PATH = "replay_tracker.csv"
-PLAYER_ID_PATH = "player_id.txt"
+PLAYER_ID_PATH = "player_index.txt"
 
 
 def list_replay_by_match_id(player_id):
@@ -23,6 +24,9 @@ def list_replay_by_match_id(player_id):
                 hero_dic[i["hero_id"]] = 1
             else:
                 hero_dic[i["hero_id"]] += 1
+    print(player_id)
+    if not bool(hero_dic):
+        return 0, []
     hero_dic = sorted(hero_dic.items(), key=lambda item: item[1], reverse=True)
     max_hero_replay = hero_dic[0][0]
     no_max_replay = hero_dic[0][1]
@@ -42,8 +46,13 @@ def add_to_replay_tracker():
     replay_tracker = pd.read_csv(REPLAY_TRACKER_PATH)
     players_id = open(PLAYER_ID_PATH, "r").read().split("\n")
     new_replays = []
+    counter = 1
     for player in players_id:
         hero, replay_list = list_replay_by_match_id(player)
+        if (counter%58) == 0:
+            print("sleeping")
+            time.sleep(60)
+        counter += 1
         for replay in replay_list:
             if replay not in replay_tracker["replay_id"].values:
                 new_dict = {
@@ -85,8 +94,8 @@ def update_replay_tracker():
 if __name__ == "__main__":
     if os.path.isfile(REPLAY_TRACKER_PATH):
         add_to_replay_tracker()
-        update_replay_tracker()
+        # update_replay_tracker()
     else:
         create_empty_replay_tracker()
         add_to_replay_tracker()
-        update_replay_tracker()
+        # update_replay_tracker()
