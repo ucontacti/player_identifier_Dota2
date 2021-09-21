@@ -1,8 +1,13 @@
 import requests
-import json
 import sys
 import time
 import datetime
+import os.path
+import pandas as pd
+
+REPLAY_TRACKER_PATH = "automation/replay_tracker.csv"
+PLAYER_ID_PATH = "automation/player_id.txt"
+
 
 def list_replay_by_match_id(player_id):
     d = datetime.datetime.now() - datetime.timedelta(days=14)
@@ -31,6 +36,34 @@ def list_replay_by_match_id(player_id):
 def get_steam64_from_steam32(steam32):
     return int(steam32) + 76561197960265728
 
+def add_to_replay_tracker():
+    replay_tracker = pd.read_csv(REPLAY_TRACKER_PATH)
+    players_id = open(PLAYER_ID_PATH, "r").read().split("\n")
+    new_replays = []
+    for player in players_id:
+        hero, replay_list = list_replay_by_match_id(player)
+        for replay in replay_list:
+            if replay not in replay_tracker["replay_id"].values:
+                new_dict = {
+                    'player_id': player, 
+                    'player_64_id': get_steam64_from_steam32(player), 
+                    'replay_id': replay, 
+                    'hero': hero, 
+                    'state': 0,
+                    'click_rate': 0
+                }
+                new_replays.append(new_dict)
+    new_plays_df = pd.DataFrame(new_replays)
+    pd.concat([replay_tracker, new_plays_df]).to_csv(REPLAY_TRACKER_PATH, index=False)
+
+def create_empty_replay_tracker():
+    pd.DataFrame(columns=['player_id', 'player_64_id', 'replay_id', 'hero', 'state','click_rate']).to_csv(REPLAY_TRACKER_PATH, index=False)
+
 if __name__ == "__main__":
-    hero, replay_list = list_replay_by_match_id(sys.argv[1])    
-    print(get_steam64_from_steam32(sys.argv[1]))
+    # hero, replay_list = list_replay_by_match_id(sys.argv[1])    
+    # print(get_steam64_from_steam32(sys.argv[1]))
+    if os.path.isfile(REPLAY_TRACKER_PATH):
+        add_to_replay_tracker()
+    else:
+        create_empty_replay_tracker()
+        add_to_replay_tracker()
