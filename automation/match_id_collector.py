@@ -5,9 +5,10 @@ import datetime
 import os.path
 import pandas as pd
 from replay_downloader import replay_download
+from feature_extractor import replay_decompress, game_info, unit_order, cursor_data
 
-REPLAY_TRACKER_PATH = "automation/replay_tracker.csv"
-PLAYER_ID_PATH = "automation/player_id.txt"
+REPLAY_TRACKER_PATH = "replay_tracker.csv"
+PLAYER_ID_PATH = "player_id.txt"
 
 
 def list_replay_by_match_id(player_id):
@@ -62,9 +63,23 @@ def create_empty_replay_tracker():
 
 def update_replay_tracker():
     replay_tracker = pd.read_csv(REPLAY_TRACKER_PATH)
+    
     new_val = replay_download(replay_tracker.loc[(replay_tracker['state'] == 0), 'replay_id'].tolist())
     replay_tracker.loc[(replay_tracker['state'] == 0),'state'] = new_val
-    new_val = feature_extractor(replay_tracker.loc[(replay_tracker['state'] == 1), 'replay_id'].tolist())
+
+    new_val = replay_decompress(replay_tracker.loc[(replay_tracker['state'] == 1), 'replay_id'].tolist())
+    replay_tracker.loc[(replay_tracker['state'] == 1),'state'] = new_val
+    
+    new_val = game_info(replay_tracker.loc[(replay_tracker['state'] == 2), 'replay_id'].tolist())
+    replay_tracker.loc[(replay_tracker['state'] == 2),'state'] = new_val
+
+    new_val = unit_order(replay_tracker.loc[(replay_tracker['state'] == 3), 'replay_id'].tolist())
+    replay_tracker.loc[(replay_tracker['state'] == 3),'state'] = new_val
+
+    new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 4), 'replay_id'].tolist(), 5)
+    replay_tracker.loc[(replay_tracker['state'] == 4),'state'] = new_val
+    replay_tracker.loc[(replay_tracker['state'] == 5),'click_rate'] = tickrate
+
     replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
 if __name__ == "__main__":

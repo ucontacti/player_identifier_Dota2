@@ -1,7 +1,6 @@
 import requests, json
 import urllib
-# TODO: Add not download handler 
-#       Add submit request
+# TODO: Add submit request
 
 
 def submit_parse_request(match):
