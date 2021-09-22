@@ -13,7 +13,7 @@ PLAYER_ID_PATH = "player_index.txt"
 
 
 def list_replay_by_match_id(player_id):
-    d = datetime.datetime.now() - datetime.timedelta(days=14)
+    d = datetime.datetime.now() - datetime.timedelta(days=10)
     unixtime = time.mktime(d.timetuple())
 
     response = requests.get("https://api.opendota.com/api/players/" + player_id + "/matches")
@@ -30,7 +30,7 @@ def list_replay_by_match_id(player_id):
     hero_dic = sorted(hero_dic.items(), key=lambda item: item[1], reverse=True)
     max_hero_replay = hero_dic[0][0]
     no_max_replay = hero_dic[0][1]
-    if no_max_replay >= 40:
+    if no_max_replay >= 30:
         replay_list = []
         for i in response.json():
             if i["start_time"] > unixtime and i["hero_id"] == max_hero_replay:
@@ -49,9 +49,6 @@ def add_to_replay_tracker():
     counter = 1
     for player in players_id:
         hero, replay_list = list_replay_by_match_id(player)
-        if (counter%58) == 0:
-            print("sleeping")
-            time.sleep(60)
         counter += 1
         for replay in replay_list:
             if replay not in replay_tracker["replay_id"].values:
@@ -64,6 +61,13 @@ def add_to_replay_tracker():
                     'click_rate': 0
                 }
                 new_replays.append(new_dict)
+        if (counter%58) == 0:
+            print("sleeping and saving batch")
+            time.sleep(60)
+            new_plays_df = pd.DataFrame(new_replays)
+            pd.concat([replay_tracker, new_plays_df]).to_csv(REPLAY_TRACKER_PATH, index=False)
+
+        
     new_plays_df = pd.DataFrame(new_replays)
     pd.concat([replay_tracker, new_plays_df]).to_csv(REPLAY_TRACKER_PATH, index=False)
 
