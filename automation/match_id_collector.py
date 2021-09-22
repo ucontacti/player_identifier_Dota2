@@ -7,6 +7,7 @@ import os.path
 import pandas as pd
 from replay_downloader import replay_download
 from feature_extractor import replay_decompress, game_info, unit_order, cursor_data
+from atomic_feature_extractor import atomic_feature
 import time
 REPLAY_TRACKER_PATH = "replay_tracker.csv"
 PLAYER_ID_PATH = "player_index.txt"
@@ -93,13 +94,16 @@ def update_replay_tracker():
     replay_tracker.loc[(replay_tracker['state'] == 4),'state'] = new_val
     replay_tracker.loc[(replay_tracker['state'] == 5),'click_rate'] = tickrate
 
+    new_val = atomic_feature(replay_tracker.loc[(replay_tracker['state'] == 5), 'replay_id'].tolist(), 5)
+    replay_tracker.loc[(replay_tracker['state'] == 5),'state'] = new_val
+    
     replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
 if __name__ == "__main__":
     if os.path.isfile(REPLAY_TRACKER_PATH):
-        add_to_replay_tracker()
-        # update_replay_tracker()
+        # add_to_replay_tracker()
+        update_replay_tracker()
     else:
         create_empty_replay_tracker()
-        add_to_replay_tracker()
-        # update_replay_tracker()
+        # add_to_replay_tracker()
+        update_replay_tracker()

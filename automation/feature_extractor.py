@@ -62,6 +62,7 @@ def cursor_data(match_id_list, tickrate = 1):
             output = subprocess.run(['java', '-jar', '/home/hap/projects/dota2/player_identifier_Dota2/data_collector/target/cursor_all.one-jar.jar', filename, str(tickrate)],         
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 check=True)
+            shutil.move("/home/hap/projects/dota2/player_identifier_Dota2/automation/features/" + match + "_cursor_tmp.csv", "/home/hap/projects/dota2/player_identifier_Dota2/automation/features/" + match + "_cursor_tmp_"  + tickrate + "_tick.csv")
             print(output)
         except:
             new_value.append(-6)
