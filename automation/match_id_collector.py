@@ -80,19 +80,24 @@ def update_replay_tracker():
     
     new_val = replay_download(replay_tracker.loc[(replay_tracker['state'] == 0), 'replay_id'].tolist())
     replay_tracker.loc[(replay_tracker['state'] == 0),'state'] = new_val
+    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
     new_val = replay_decompress(replay_tracker.loc[(replay_tracker['state'] == 1), 'replay_id'].tolist())
     replay_tracker.loc[(replay_tracker['state'] == 1),'state'] = new_val
+    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
     
     new_val = game_info(replay_tracker.loc[(replay_tracker['state'] == 2), 'replay_id'].tolist())
     replay_tracker.loc[(replay_tracker['state'] == 2),'state'] = new_val
+    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
     new_val = unit_order(replay_tracker.loc[(replay_tracker['state'] == 3), 'replay_id'].tolist())
     replay_tracker.loc[(replay_tracker['state'] == 3),'state'] = new_val
+    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
     new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 4), 'replay_id'].tolist(), 5)
     replay_tracker.loc[(replay_tracker['state'] == 4),'state'] = new_val
     replay_tracker.loc[(replay_tracker['state'] == 5),'click_rate'] = tickrate
+    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
     new_val = atomic_feature(replay_tracker.loc[(replay_tracker['state'] == 5), 'replay_id'].tolist(), 5)
     replay_tracker.loc[(replay_tracker['state'] == 5),'state'] = new_val
