@@ -13,6 +13,7 @@ def atomic_feature(match_id_list, tick_rate):
 
 
     for match_id in match_id_list:
+        match_id = str(match_id)
         df_cursor = pd.read_csv("features/" + match_id + "_cursor_tmp_"  + tick_rate + "_tick.csv")
         df_unit_order = pd.read_csv("features/" + match_id + "_unit_order_v2.csv")
         df_unit_order.drop_duplicates(inplace=True)
