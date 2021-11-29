@@ -59,7 +59,11 @@ def add_to_replay_tracker():
                     'replay_id': replay, 
                     'hero': hero, 
                     'state': 0,
-                    'click_rate': 0
+                    '1_tick': False,
+                    '5_tick': False,
+                    '10_tick': False,
+                    '15_tick': False,
+                    '30_tick': False,
                 }
                 new_replays.append(new_dict)
         if (counter%58) == 0:
@@ -73,7 +77,7 @@ def add_to_replay_tracker():
     pd.concat([replay_tracker, new_plays_df]).to_csv(REPLAY_TRACKER_PATH, index=False)
 
 def create_empty_replay_tracker():
-    pd.DataFrame(columns=['player_id', 'player_64_id', 'replay_id', 'hero', 'state','click_rate']).to_csv(REPLAY_TRACKER_PATH, index=False)
+    pd.DataFrame(columns=['player_id', 'player_64_id', 'replay_id', 'hero', 'state', '1_tick', '5_tick', '10_tick', '15_tick', '30_tick']).to_csv(REPLAY_TRACKER_PATH, index=False)
 
 def update_replay_tracker():
     replay_tracker = pd.read_csv(REPLAY_TRACKER_PATH)
@@ -96,7 +100,8 @@ def update_replay_tracker():
 
     new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 4), 'replay_id'].tolist(), 5)
     replay_tracker.loc[(replay_tracker['state'] == 4),'state'] = new_val
-    replay_tracker.loc[(replay_tracker['state'] == 5),'click_rate'] = tickrate
+    tickrate_column = str(tickrate) + "_tick"
+    replay_tracker.loc[(replay_tracker['state'] == 5),tickrate_column] = True
     replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
     new_val = atomic_feature(replay_tracker.loc[(replay_tracker['state'] == 5), 'replay_id'].tolist(), 5)
@@ -112,3 +117,30 @@ if __name__ == "__main__":
         create_empty_replay_tracker()
         # add_to_replay_tracker()
         update_replay_tracker()
+        998155679
+
+        115706758
+154557332
+169470416
+129144093
+127395411
+897189771
+48406641
+123760489
+101532724
+189095558
+201139654
+37634659
+219740999
+89615102
+264671088
+164907650
+173404520
+84379306
+137529744
+30678519
+136704501
+149283035
+298572686
+40739778
+998155679
