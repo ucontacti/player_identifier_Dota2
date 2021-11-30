@@ -38,6 +38,7 @@ for match_id in authentic_match_id:
         hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
         df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
         df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
+        df_hero_cursor["Action"] = pd.to_numeric(df_hero_cursor["Action"])
         df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], hero["Tick"].values)
         df_hero_cursor.dropna(inplace=True)
         df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
@@ -55,7 +56,6 @@ for match_id in authentic_match_id:
         df_hero_cursor["Cur"] = df_hero_cursor["AoM"].diff() / df_hero_cursor["S"].diff()
         df_hero_cursor["Y_diff"] = df_hero_cursor["Y"].diff()
         df_hero_cursor["X_diff"] = df_hero_cursor["X"].diff()
-        # df_hero_cursor.drop("S", axis=0, inplace=True)
         # df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"].diff()
         df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Y_diff":0, "X_diff":0}, inplace=True)
         atomic_order = df_hero_cursor.groupby("range").agg({
@@ -73,6 +73,13 @@ for match_id in authentic_match_id:
             "Cur":["min", "max", "mean", "std"]
             # "Cur_cr":["min", "max", "mean", "std"],
             }).fillna(0).replace([np.inf, -np.inf], 0)
+        df_hero_cursor.drop("S", axis=0, inplace=True)
+        
+        if (hero_name == "CDOTA_Unit_Hero_PhantomLancer"):
+            print(atomic_order["Action"]["first"])
+            print(atomic_order[atomic_order["Action"]["first"] != 1].index)
+            print(atomic_order[atomic_order["Action"]["first"] != 2].index)
+            print(atomic_order[atomic_order["Action"]["first"] != 3].index)
         atomic_order["distance"] = np.sqrt(atomic_order["X_diff"]["sum"]**2 + atomic_order["Y_diff"]["sum"]**2)
         atomic_order.drop("X_diff", axis=1 ,inplace=True)
         atomic_order.drop("Y_diff", axis=1 ,inplace=True)

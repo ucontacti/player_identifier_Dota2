@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 def atomic_feature(match_id_list, tick_rate):
+    tick_rate = str(tick_rate)
     new_X = []
     counter = 1
     new_X_mov = []
@@ -14,6 +15,7 @@ def atomic_feature(match_id_list, tick_rate):
 
     for match_id in match_id_list:
         match_id = str(match_id)
+        print(match_id)
         df_cursor = pd.read_csv("features/" + match_id + "_cursor_tmp_"  + tick_rate + "_tick.csv")
         df_unit_order = pd.read_csv("features/" + match_id + "_unit_order_v2.csv")
         df_unit_order.drop_duplicates(inplace=True)
@@ -28,6 +30,7 @@ def atomic_feature(match_id_list, tick_rate):
             hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
             df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
             df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
+            df_hero_cursor["Action"] = pd.to_numeric(df_hero_cursor["Action"])
             df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], hero["Tick"].values)
             df_hero_cursor.dropna(inplace=True)
             df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
@@ -67,6 +70,10 @@ def atomic_feature(match_id_list, tick_rate):
             atomic_order.drop("X_diff", axis=1 ,inplace=True)
             atomic_order.drop("Y_diff", axis=1 ,inplace=True)
             atomic_order.drop(atomic_order[atomic_order["Tick"]["count"] < 2].index, inplace = True)
+            if (atomic_order[atomic_order["Action"]["first"] != 1].index.empty or atomic_order[atomic_order["Action"]["first"] != 2].index.empty or atomic_order[atomic_order["Action"]["first"] != 3].index.empty):
+                 print("Empty action")
+                 new_val.append(-7)
+                 break
             atomic_order_move = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 1].index)
             atomic_order_attack = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 2].index)
             atomic_order_spell = atomic_order.drop(atomic_order[atomic_order["Action"]["first"] != 3].index)
@@ -80,31 +87,30 @@ def atomic_feature(match_id_list, tick_rate):
             new_X.append(atomic_order_arr)
             new_val.append(6)
 
-        print("batch " + str(counter) + "/" + str(len(match_id_list)))
+        print("replay " + str(counter) + "/" + str(len(match_id_list)))
         counter += 1
         if (counter%100) == 0:
-            filename = "atomic_move_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+            filename = "trainable_feature/atomic_move_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
             np.save(filename, new_X_mov, allow_pickle=True)
-            filename = "atomic_attack_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+            filename = "trainable_feature/atomic_attack_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
             np.save(filename, new_X_att, allow_pickle=True)
-            filename = "atomic_spell_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+            filename = "trainable_feature/atomic_spell_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
             np.save(filename, new_X_spl, allow_pickle=True)
-            filename = "atomic_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+            filename = "trainable_feature/atomic_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
             np.save(filename, new_X, allow_pickle=True)
             new_X = []
             new_X_mov = []
             new_X_att = []
             new_X_spl = []
             batch_number += 1
-            counter = 1
     if new_X:
-        filename = "atomic_move_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+        filename = "trainable_feature/atomic_move_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
         np.save(filename, new_X_mov, allow_pickle=True)
-        filename = "atomic_attack_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+        filename = "trainable_feature/atomic_attack_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
         np.save(filename, new_X_att, allow_pickle=True)
-        filename = "atomic_spell_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+        filename = "trainable_feature/atomic_spell_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
         np.save(filename, new_X_spl, allow_pickle=True)
-        filename = "atomic_v5_tickrate_" + tick_rate + "_batch_" + batch_number + ".npy"
+        filename = "trainable_feature/atomic_v5_tickrate_" + tick_rate + "_batch_" + str(batch_number) + ".npy"
         np.save(filename, new_X, allow_pickle=True)
     return new_val
 
