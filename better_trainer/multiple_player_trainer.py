@@ -59,8 +59,11 @@ for player in steamer.index:
     # from sklearn.linear_model import LogisticRegression
     # clf = LogisticRegression(class_weight="balanced", max_iter = 1000).fit(X_train, y_train)
 
-    from sklearn.neural_network import MLPClassifier
-    clf = MLPClassifier(random_state=42, alpha=0.001).fit(X_train, y_train)
+    # from sklearn.neural_network import MLPClassifier
+    # clf = MLPClassifier(random_state=42, alpha=0.001).fit(X_train, y_train)
+
+    from sklearn.linear_model import SGDClassifier
+    clf = SGDClassifier().fit(X_train, y_train)
 
     #from sklearn.ensemble import RandomForestClassifier
     #clf = RandomForestClassifier(class_weight="balanced").fit(X_train, y_train)
@@ -75,7 +78,7 @@ for player in steamer.index:
     result_values[player, hero_name] = round(result_rm["test_f1"].mean()*100,2)
     print("batch " + str(counter))
     counter += 1
-print("NN results --------------------------------------------------------")
+print("SVM results --------------------------------------------------------")
 print("accuracy: " + str(sum(result_dict["accuracy"]) / len(result_dict["accuracy"])))
 print("precision: " + str(sum(result_dict["precision"]) / len(result_dict["precision"])))
 print("recall: " + str(sum(result_dict["recall"]) / len(result_dict["recall"])))
@@ -178,3 +181,5 @@ print("roc: " + str(sum(result_dict["roc"]) / len(result_dict["roc"])))
 print("eer: " + str(sum(result_dict["eer"]) / len(result_dict["eer"])))
 print(result_values)
 
+
+# %%
