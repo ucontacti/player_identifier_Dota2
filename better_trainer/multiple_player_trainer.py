@@ -11,6 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn import preprocessing
         
 
 # In[]: Calculate eer rate
@@ -43,9 +44,13 @@ def train(model, model_name, steamer, X):
 
         X_train, X_test, y_train, y_test = train_test_split(new_X, y, test_size=0.25, random_state=42)
 
-        clf = model.fit(X_train, y_train)
+        # X_train, X_test, y_train, y_test = train_test_split(new_X, y, test_size=0.25, random_state=42)
+        new_X = preprocessing.StandardScaler().fit(new_X).transform(new_X)
+        # new_X = preprocessing.RobustScaler().fit(new_X).transform(new_X)
 
-        result_rm=cross_validate(clf, new_X, y, cv=5,scoring={'precision': 'precision', 'recall': 'recall', 'accuracy': 'accuracy', 'f1': 'f1', 'roc_auc': 'roc_auc', 'eer': make_scorer(calculate_eer)})
+        # clf = model.fit(X_train, y_train)
+
+        result_rm=cross_validate(model, new_X, y, cv=5,scoring={'precision': 'precision', 'recall': 'recall', 'accuracy': 'accuracy', 'f1': 'f1', 'roc_auc': 'roc_auc', 'eer': make_scorer(calculate_eer)})
         result_dict["accuracy"].append(round(result_rm["test_accuracy"].mean()*100,2))
         result_dict["precision"].append(round(result_rm["test_precision"].mean()*100,2))
         result_dict["recall"].append(round(result_rm["test_recall"].mean()*100,2))
