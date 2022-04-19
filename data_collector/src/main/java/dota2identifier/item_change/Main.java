@@ -42,9 +42,13 @@ public class Main {
 
     // TODO: Improve hero recognition
     private boolean isHero(Entity e) {
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Hawk"))
+            return false;
+        if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Boar"))
+            return false;
         return e.getDtClass().getDtName().startsWith("CDOTA_Unit_Hero");
     }
-
+    
     private int tick;
     private int item_updater_tick;
     private int cursor_updater_tick;
@@ -53,10 +57,7 @@ public class Main {
     private int count;
     private ArrayList<Entity> ent_list=new ArrayList<Entity>();
     private Hashtable<Integer, String> heroHashtbl = new Hashtable<Integer, String>();;
-    private PrintWriter mouse_writer;
-    private PrintWriter mouse_writer_updater;
-    private PrintWriter item_writer;
-    private PrintWriter item_writer_updater;
+    private PrintWriter item_updater;
 
     public String getEntityNameByHandle(int id, Entities entities, StringTable stringTable) {
         Entity entity = entities.getByHandle(id);
@@ -91,35 +92,42 @@ public class Main {
     public void onItemChange(Context ctx, Entity et, FieldPath fp)
     {
         if (item_updater_tick != ctx.getTick() || !et.getDtClass().getDtName().equals(update_hero_name))
-        {     
-            update_hero_name = et.getDtClass().getDtName();
-            item_updater_tick = ctx.getTick();
-            Entities entities = ctx.getProcessor(Entities.class);
-            StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
-            int itemId;
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(item_updater_tick + 1);
-            sb.append(',');
-            sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-            for (int i=0; i<9; i++)
+        {
+            if (((int) et.getProperty("m_hReplicatingOtherHeroModel") == 16777215)) 
             {
-                String item_slot = String.format("m_hItems.%04d", i);
-                int item_id = et.getProperty(item_slot);
-                String item_name = getEntityNameByHandle(item_id, entities, stringTable);
+                update_hero_name = et.getDtClass().getDtName();
+                item_updater_tick = ctx.getTick();
+                Entities entities = ctx.getProcessor(Entities.class);
+                StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
+                int itemId;
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(item_updater_tick + 1);
                 sb.append(',');
-                // sb.append(item_name);
-                sb.append(item_id);
+                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                for (int i=0; i<9; i++)
+                {
+                    String item_slot = String.format("m_hItems.%04d", i);
+                    int item_id = et.getProperty(item_slot);
+                    String item_name = getEntityNameByHandle(item_id, entities, stringTable);
+                    sb.append(',');
+                    // sb.append(item_name);
+                    sb.append(item_id);
+                }
+                // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
+                sb.append('\n');
+                item_updater.write(sb.toString());
             }
-            // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
-            sb.append('\n');
-            item_writer_updater.write(sb.toString());
         }
     }
 
 
     public void run(String[] args) throws Exception {
-        item_writer_updater = new PrintWriter(new File("test_item_change.csv"));
+        String rep_pwd = args[0];
+
+        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_item_change_tmp.csv";
+        
+        item_updater = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
         sb.append("Tick");
         sb.append(',');
@@ -144,26 +152,16 @@ public class Main {
         sb.append("Item9");
         sb.append(',');
         sb.append('\n');
-        item_writer_updater.write(sb.toString());
+        item_updater.write(sb.toString());
 
 
         long tStart = System.currentTimeMillis();
         new SimpleRunner(new MappedFileSource(args[0])).runWith(this);
         long tMatch = System.currentTimeMillis() - tStart;
         log.info("total time taken: {}s", (tMatch) / 1000.0);
-        item_writer_updater.close();
+        item_updater.close();
     }
 
-    public void runControlled(String[] args) throws Exception {
-        long tStart = System.currentTimeMillis();
-        ControllableRunner runner = new ControllableRunner(new MappedFileSource(args[0])).runWith(this);
-        while(!runner.isAtEnd()) {
-            runner.tick();
-        }
-        long tMatch = System.currentTimeMillis() - tStart;
-        log.info("total time taken: {}s", (tMatch) / 1000.0);
-        
-    }
 
 
     public static void main(String[] args) throws Exception {
