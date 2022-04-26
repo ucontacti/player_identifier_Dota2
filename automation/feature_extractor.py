@@ -53,6 +53,23 @@ def unit_order(match_id_list):
         new_val.append(4)
     return new_val
 
+def item_change(match_id_list):
+    ## make sure the feature folder exists
+    new_val = []
+    for match in match_id_list:
+        match = str(match)
+        filename = "downloaded_replays/" + match + ".dem"
+        try:
+            output = subprocess.run(['java', '-jar', 'java/item_change.one-jar.jar', filename],         
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                check=True)
+            print(output)
+        except:
+            new_val.append(-6)
+            continue
+        new_val.append(5)
+    return new_val
+
 def cursor_data(match_id_list, tickrate = 1):
     ## make sure the feature folder exists
     new_val = []
@@ -66,8 +83,8 @@ def cursor_data(match_id_list, tickrate = 1):
             shutil.move("java/features/" + match + "_cursor_tmp.csv", "java/features/" + match + "_cursor_tmp_"  + tickrate + "_tick.csv")
             print(output)
         except:
-            new_val.append(-6)
+            new_val.append(-7)
             continue
         
-        new_val.append(5)
+        new_val.append(6)
     return new_val, tickrate
