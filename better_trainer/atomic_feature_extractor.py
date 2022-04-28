@@ -23,7 +23,7 @@ for hero in dfs_unit_order:
     hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
     df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
     
-    df_hero_cursor.drop_duplicates(subset=["X", "Y"], keep="last", inplace=True)
+    # df_hero_cursor.drop_duplicates(subset=["X", "Y"], keep="last", inplace=True)
     # df_hero_tmp = df_hero_cursor.drop_duplicates(subset=["X", "Y"], keep="last")
     # df_hero_tmp["seq"] = df_hero_tmp["Tick"].diff()
     # tbd_index = pd.cut(df_hero_tmp[df_hero_tmp["seq"] > 10]["Tick"], hero["Tick"].values).drop_duplicates(keep="last").index.values[:-1]
@@ -41,8 +41,11 @@ for hero in dfs_unit_order:
     # df_hero_cursor.fillna({"S":0}, inplace=True)
     # df_hero_cursor["S"] = np.cumsum(df_hero_cursor["S"])
     df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick"].diff()
+    df_hero_cursor["A_X"] = df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick"].diff()
+    df_hero_cursor["A_Y"] = df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick"].diff()
     df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick"].diff()
     df_hero_cursor["AoM"] = np.arctan2(df_hero_cursor["Y"], df_hero_cursor["X"])
+    df_hero_cursor["AoM"] = df_hero_cursor["AoM"].diff()
     # df_hero_cursor.fillna({"AoM":0}, inplace=True)
     # df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
     df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"] / df_hero_cursor["Tick"].diff()
@@ -51,14 +54,14 @@ for hero in dfs_unit_order:
     df_hero_cursor["Y_diff"] = df_hero_cursor["Y"].diff()
     df_hero_cursor["X_diff"] = df_hero_cursor["X"].diff()
     df_hero_cursor["TCM"] = df_hero_cursor["Tick"] * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-    df_hero_cursor["SC"] = (df_hero_cursor["Tick"] ** 2) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-    df_hero_cursor["M3"] = (df_hero_cursor["Tick"] ** 3) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-    df_hero_cursor["M4"] = (df_hero_cursor["Tick"] ** 4) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-    df_hero_cursor["TCrv"] = (df_hero_cursor["V_X"] * df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick"].diff() \
-                            - df_hero_cursor["V_Y"] * df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick"].diff())\
-                            / np.power(df_hero_cursor["V_X"] ** 2 + df_hero_cursor["V_Y"] ** 2, 1.5)
+    df_hero_cursor["SC"] = (df_hero_cursor["Tick"].diff() ** 2) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
+    df_hero_cursor["M3"] = (df_hero_cursor["Tick"].diff() ** 3) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
+    df_hero_cursor["M4"] = (df_hero_cursor["Tick"].diff() ** 4) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
+    df_hero_cursor["TCrv"] =    (df_hero_cursor["V_X"] * df_hero_cursor["A_Y"] 
+                                - df_hero_cursor["V_Y"] * df_hero_cursor["A_X"])\
+                                / np.power(df_hero_cursor["V_X"] ** 2 + df_hero_cursor["V_Y"] ** 2, 1.5)
     df_hero_cursor["VCrv"] = df_hero_cursor["J"] / np.power(1 + df_hero_cursor["A"] ** 2, 1.5)
-    
+    print("bruh")
     df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0, "Y_diff":0, "X_diff":0}, inplace=True)
     atomic_order = df_hero_cursor.groupby("range").agg(
         Tick=("Tick", "count"), 
@@ -177,9 +180,12 @@ for match_id in authentic_match_id:
         df_hero_cursor["S"] = np.sqrt(df_hero_cursor["X"].diff()**2 + df_hero_cursor["Y"].diff()**2)
         # df_hero_cursor.fillna({"S":0}, inplace=True)
         # df_hero_cursor["S"] = np.cumsum(df_hero_cursor["S"])
+        df_hero_cursor["A_X"] = df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["A_Y"] = df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["AoM"] = np.arctan2(df_hero_cursor["Y"], df_hero_cursor["X"])
+        df_hero_cursor["AoM"] = df_hero_cursor["AoM"].diff()
         # df_hero_cursor.fillna({"AoM":0}, inplace=True)
         # df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
         df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"] / df_hero_cursor["Tick"].diff()
@@ -191,8 +197,8 @@ for match_id in authentic_match_id:
         df_hero_cursor["SC"] = (df_hero_cursor["Tick"] ** 2) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
         df_hero_cursor["M3"] = (df_hero_cursor["Tick"] ** 3) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
         df_hero_cursor["M4"] = (df_hero_cursor["Tick"] ** 4) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-        df_hero_cursor["TCrv"] = (df_hero_cursor["V_X"] * df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick"].diff() \
-                                - df_hero_cursor["V_Y"] * df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick"].diff())\
+        df_hero_cursor["TCrv"] = (df_hero_cursor["V_X"] * df_hero_cursor["A_Y"] \
+                                - df_hero_cursor["V_Y"] * df_hero_cursor["A_X"])\
                                 / np.power(df_hero_cursor["V_X"] ** 2 + df_hero_cursor["V_Y"] ** 2, 1.5)
         df_hero_cursor["VCrv"] = df_hero_cursor["J"] / np.power(1 + df_hero_cursor["A"] ** 2, 1.5)
         df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0, "Y_diff":0, "X_diff":0}, inplace=True)
