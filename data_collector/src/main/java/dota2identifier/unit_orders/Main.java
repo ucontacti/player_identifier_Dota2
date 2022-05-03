@@ -167,11 +167,6 @@ public class Main {
         
         if (ent_list.contains(et))
         {
-            if(ctx.getTick() == 32902)
-            {    System.out.println(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                if (isGamePlayer(et))
-                    System.out.println("daimm");
-            }
             StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
             StringBuilder sb = new StringBuilder();
             switch (message.getOrderType()) {

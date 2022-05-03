@@ -22,18 +22,18 @@ for hero in dfs_unit_order:
     hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
     hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
     df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
-    
-    # df_hero_cursor.drop_duplicates(subset=["X", "Y"], keep="last", inplace=True)
-    # df_hero_tmp = df_hero_cursor.drop_duplicates(subset=["X", "Y"], keep="last")
-    # df_hero_tmp["seq"] = df_hero_tmp["Tick"].diff()
-    # tbd_index = pd.cut(df_hero_tmp[df_hero_tmp["seq"] > 10]["Tick"], hero["Tick"].values).drop_duplicates(keep="last").index.values[:-1]
+
+    cols = ["X", "Y"]
+    df_hero_tmp = df_hero_cursor.loc[(df_hero_cursor[cols].shift(-1) != df_hero_cursor[cols]).any(axis=1)]
+    df_hero_tmp["seq"] = df_hero_tmp["Tick"].diff()
+    tbd_index = pd.cut(df_hero_tmp[df_hero_tmp["seq"] > 10]["Tick"], hero["Tick"].values).drop_duplicates(keep="last").index.values[:-1]
     df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
     df_hero_cursor["Action"] = pd.to_numeric(df_hero_cursor["Action"])
     df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], hero["Tick"].values)
-    # for rm in tbd_index:
-    #     df_hero_cursor.drop( df_hero_cursor[(df_hero_cursor.loc[rm]["range"].left <= df_hero_cursor["Tick"]) & (df_hero_cursor["Tick"] <= df_hero_cursor.loc[rm]["Tick"])].index, inplace=True)
-    
+    for rm in tbd_index:
+        df_hero_cursor.drop(df_hero_cursor[(df_hero_cursor.loc[rm]["range"].left <= df_hero_cursor["Tick"]) & (df_hero_cursor["Tick"] <= df_hero_cursor.loc[rm]["Tick"])].index, inplace=True)
     df_hero_cursor.dropna(inplace=True)
+
     df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
     df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
     df_hero_cursor["V"] = np.sqrt(df_hero_cursor["V_X"]**2 + df_hero_cursor["V_Y"]**2)
@@ -168,11 +168,16 @@ for match_id in authentic_match_id:
         except:
             continue
 
-        df_hero_cursor.drop_duplicates(subset=["X", "Y"], keep="last", inplace=True)
+        cols = ["X", "Y"]
+        df_hero_tmp = df_hero_cursor.loc[(df_hero_cursor[cols].shift(-1) != df_hero_cursor[cols]).any(axis=1)]
+        df_hero_tmp["seq"] = df_hero_tmp["Tick"].diff()
+        tbd_index = pd.cut(df_hero_tmp[df_hero_tmp["seq"] > 10]["Tick"], hero["Tick"].values).drop_duplicates(keep="last").index.values[:-1]
         df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
         df_hero_cursor["Action"] = pd.to_numeric(df_hero_cursor["Action"])
         df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], hero["Tick"].values)
-    
+        for rm in tbd_index:
+            df_hero_cursor.drop(df_hero_cursor[(df_hero_cursor.loc[rm]["range"].left <= df_hero_cursor["Tick"]) & (df_hero_cursor["Tick"] <= df_hero_cursor.loc[rm]["Tick"])].index, inplace=True)
+        
         df_hero_cursor.dropna(inplace=True)
         df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
         df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
