@@ -192,7 +192,6 @@ public class Main {
                 break;
             case 5: // cast spell action
             case 6:
-            // case 8:
                 sb.append(ctx.getTick());
                 sb.append(',');
                 sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));

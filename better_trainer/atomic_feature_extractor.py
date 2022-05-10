@@ -131,6 +131,8 @@ for hero in dfs_unit_order:
 
 
 # In[2]: Complex mouse action
+replay_tracker = pd.read_csv("replay_tracker.csv")
+
 authentic_match_id = replay_tracker.loc[(replay_tracker['state'] == 6) & (replay_tracker['1_tick'] == True), 'replay_id'].tolist()
 
 counter = 1
