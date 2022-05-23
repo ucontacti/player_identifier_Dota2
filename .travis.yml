@@ -1,0 +1,11 @@
+jobs:
+  include:
+
+# Java step
+    - language: java
+      before_script:
+        - cd data_collector
+        - mkdir features
+      script: 
+        - mvn -P item_all package
+        - java -jar target/item_all.one-jar.jar ../replay_downloader/downloads/6022177534.dem
