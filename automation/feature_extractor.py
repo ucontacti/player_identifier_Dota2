@@ -70,6 +70,23 @@ def item_change(match_id_list):
         new_val.append(5)
     return new_val
 
+def item_all(match_id_list):
+    ## make sure the feature folder exists
+    new_val = []
+    for match in match_id_list:
+        match = str(match)
+        filename = os.path.abspath("downloads/" + match + ".dem")
+        try:
+            output = subprocess.run(['java', '-jar', 'java/item_all.one-jar.jar', filename], 
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                check=True)
+            print(output)
+        except:
+            new_val.append(-7)
+            continue
+        new_val.append(6)
+    return new_val
+
 def cursor_data(match_id_list, tickrate = 1):
     ## make sure the feature folder exists
     new_val = []
@@ -83,8 +100,8 @@ def cursor_data(match_id_list, tickrate = 1):
             shutil.move("java/features/" + match + "_cursor_tmp.csv", "java/features/" + match + "_cursor_tmp_"  + tickrate + "_tick.csv")
             print(output)
         except:
-            new_val.append(-7)
+            new_val.append(-8)
             continue
         
-        new_val.append(6)
+        new_val.append(7)
     return new_val, tickrate

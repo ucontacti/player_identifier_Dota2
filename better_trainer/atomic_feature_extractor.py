@@ -19,6 +19,8 @@ dfs_cursor = [rows for _, rows in df_cursor.groupby('Hero')]
 dfs_unit_order = [rows for _, rows in df_unit_order.groupby('Hero')]
 for hero in dfs_unit_order:
     steam_id = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["SteamId"]
+    if steam_id != 76561198085066985:
+        continue
     hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
     hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
     df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]

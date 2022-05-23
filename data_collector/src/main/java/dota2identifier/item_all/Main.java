@@ -177,8 +177,8 @@ public class Main {
                                 int item_id = et.getProperty(item_slot);
                                 String item_name = getEntityNameByHandle(item_id, entities, stringTable);
                                 sb.append(',');
-                                // sb.append(item_name);
-                                sb.append(item_id);
+                                sb.append(item_name);
+                                // sb.append(item_id);
                             }
                             // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
                             sb.append('\n');

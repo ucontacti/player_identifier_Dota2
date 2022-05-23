@@ -39,7 +39,7 @@ def train(model, model_name, X, labels):
         # new_X = preprocessing.RobustScaler().fit(new_X).transform(new_X)
 
         # clf = model.fit(X_train, y_train)
-        result_rm=cross_validate(model, X, new_y, cv=5,scoring={'precision': 'precision', 'recall': 'recall', 'accuracy': 'accuracy', 'f1': '>
+        result_rm=cross_validate(model, X, new_y, cv=5,scoring={'precision': 'precision', 'recall': 'recall', 'accuracy': 'accuracy', 'f1': 'f1', 'roc_auc': 'roc_auc', 'eer': make_scorer(calculate_eer)}, return_estimator=True)
         result_dict["accuracy"].append(round(result_rm["test_accuracy"].mean()*100,2))
         result_dict["precision"].append(round(result_rm["test_precision"].mean()*100,2))
         result_dict["recall"].append(round(result_rm["test_recall"].mean()*100,2))
