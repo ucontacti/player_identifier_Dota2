@@ -158,17 +158,20 @@ def player_link(my_url, webdriver_path):
 
 if __name__ == "__main__":
     new_players = []
-    chromium_path = sys.argv[1] if os.path.exists(sys.argv[1]) else "../../chromedriver"
-    if os.path.exists('player_index.txt'):
-        with open('player_index.txt', 'r') as filehandle:
-            for line in filehandle:
-                currentPlace = line[:-1]
-                new_players.append(currentPlace)
-    for hero_link in DOTABUFF_HEROES:
-        print(hero_link)
-        new_players.extend(player_link(hero_link, chromium_path))
-        print("Done!")
-    new_players = list(set(new_players))
-    with open('player_index.txt', 'a') as filehandle:
-        for listitem in new_players:
-            filehandle.write('%s\n' % listitem)
+    if len(sys.argv) < 2 or not os.path.exists(sys.argv[1]):
+        print("chromedriver not found!")
+    else:
+        chromium_path = sys.argv[1]
+        if os.path.exists('player_index.txt'):
+            with open('player_index.txt', 'r') as filehandle:
+                for line in filehandle:
+                    currentPlace = line[:-1]
+                    new_players.append(currentPlace)
+        for hero_link in DOTABUFF_HEROES:
+            print(hero_link)
+            new_players.extend(player_link(hero_link, chromium_path))
+            print("Done!")
+        new_players = list(set(new_players))
+        with open('player_index.txt', 'a') as filehandle:
+            for listitem in new_players:
+                filehandle.write('%s\n' % listitem)
