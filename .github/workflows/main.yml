@@ -40,7 +40,6 @@ jobs:
         working-directory: final
         run: "python3 player_id_scraper.py"
 
-jobs:
   build:
     runs-on: ubuntu-latest
 
