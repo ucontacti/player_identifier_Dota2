@@ -6,8 +6,13 @@ import skadistats.clarity.wire.common.proto.Demo.CDemoFileInfo;
 import java.io.File;
 import java.io.PrintWriter;
 
-public class Main {
-    
+/**
+ * Class to collect game info. Player's 
+ * 64 bit version steam id and the hero 
+ * is recorded.
+ */
+
+public class Main {    
     
     public static String get_cdota_from_npc(String hero_name)
     {
@@ -160,7 +165,6 @@ public class Main {
             sb.append('\n');
             info_writer.write(sb.toString());
         }
-
         info_writer.close();
     }
 }

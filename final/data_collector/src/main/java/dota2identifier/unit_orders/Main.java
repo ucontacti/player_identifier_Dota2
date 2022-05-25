@@ -42,6 +42,10 @@ import java.util.*;
 import java.io.File;
 import java.io.PrintWriter;
 
+/**
+ * Class to collect all the unit order data for each
+ * player given a replay
+ */
 public class Main {
 
     private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
@@ -51,7 +55,6 @@ public class Main {
     private boolean running = false;
 
 
-    // TODO: Improve hero recognition
     private boolean isHero(Entity e) {
         if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Hawk"))
             return false;
@@ -145,21 +148,19 @@ public class Main {
 
     @OnEntityCreated
     public void onCreated(Entity e) {
-        // if(isHero(e))
-        //     if (0 <= Integer.parseInt(e.getProperty("m_iPlayerID"))  && Integer.parseInt(e.getProperty("m_iPlayerID")) <= 9)
-        // if(e.getDtClass().getDtName().equals("CDOTAPlayer"))
-        // {
-        //         ent_list.add(e);
-        // }
         if (isHero(e)) {
             Integer id = e.getProperty("m_iPlayerID");
             heroHashtbl.put(id, e.getDtClass().getDtName());
-            // ent_list.add(e);
         }     
     }
 
-    // @UsesStringTable("EntityNames")
-    // @UsesEntities
+    /**
+     * The most important method that raises everytime there a 
+     * unit order message. Depending on the type of unit order
+     * records the unit order
+     * @param ctx
+     * @param message
+     */
     @OnMessage(DotaUserMessages.CDOTAUserMsg_SpectatorPlayerUnitOrders.class)
     public void onMessage(Context ctx, DotaUserMessages.CDOTAUserMsg_SpectatorPlayerUnitOrders message) 
     {
@@ -204,15 +205,15 @@ public class Main {
         }
     //     if (message.hasAbilityId())
     //     {
-    // //         log.info("orderType: {}, hasTargetIndex: {}, hasTargetIndex: {}, hasAbilityId: {}, hasPostion: {}",
-    // //         // ctx.getTick(),
-    // //         // message.getEntindex(),
-    // //         message.getOrderType(),
-    // //         message.hasTargetIndex(),
-    // //         message.hasTargetIndex(),
-    // //         message.hasAbilityId(),
-    // //         message.hasPosition()
-    // // );
+    //         log.info("orderType: {}, hasTargetIndex: {}, hasTargetIndex: {}, hasAbilityId: {}, hasPostion: {}",
+    //         // ctx.getTick(),
+    //         // message.getEntindex(),
+    //         message.getOrderType(),
+    //         message.hasTargetIndex(),
+    //         message.hasTargetIndex(),
+    //         message.hasAbilityId(),
+    //         message.hasPosition()
+    // );
     //     int ability_id = message.getAbilityId();
     //         String ability_name = getEntityNameByHandle(ability_id, entities, stringTable);
     //         if (ability_name != null)
@@ -286,5 +287,4 @@ public class Main {
     public static void main(String[] args) throws Exception {
         new Main().runControlled(args);
     }
-
 }

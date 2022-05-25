@@ -36,11 +36,14 @@ import java.util.Hashtable;
 import java.io.File;
 import java.io.PrintWriter;
 
+/**
+ * Class to collect all the item slot change 
+ * data for each player given a replay
+ */
 public class Main {
 
     private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
 
-    // TODO: Improve hero recognition
     private boolean isHero(Entity e) {
         if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Hawk"))
             return false;
@@ -73,8 +76,6 @@ public class Main {
 
     @OnEntityCreated
     public void onCreated(Entity e) {
-        // if(isHero(e))
-        //     if (0 <= Integer.parseInt(e.getProperty("m_iPlayerID"))  && Integer.parseInt(e.getProperty("m_iPlayerID")) <= 9)
         if(e.getDtClass().getDtName().equals("CDOTAPlayer"))
         {
                 ent_list.add(e);
@@ -114,7 +115,6 @@ public class Main {
                     sb.append(item_name);
                     // sb.append(item_id);
                 }
-                // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
                 sb.append('\n');
                 item_updater.write(sb.toString());
             }
@@ -167,5 +167,4 @@ public class Main {
     public static void main(String[] args) throws Exception {
         new Main().run(args);
     }
-
 }

@@ -37,6 +37,11 @@ import java.util.*;
 import java.io.File;
 import java.io.PrintWriter;
 
+/**
+ * Class to collect all the item data for each
+ * player given a replay
+ */
+
 public class Main {
 
     private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
@@ -100,8 +105,6 @@ public class Main {
 
     @OnEntityCreated
     public void onCreated(Entity e) {
-        // if(isHero(e))
-        //     if (0 <= Integer.parseInt(e.getProperty("m_iPlayerID"))  && Integer.parseInt(e.getProperty("m_iPlayerID")) <= 9)
         if(e.getDtClass().getDtName().equals("CDOTAPlayer"))
         {
                 ent_list.add(e);
@@ -149,6 +152,14 @@ public class Main {
         }
     }
 
+    /**
+     * The most important method that every tick for
+     * every hero records the item slot from 1 to 9 of the
+     * cursor on the screen
+     * @param ctx
+     * @param synthetic
+     */
+
     @UsesEntities
     @UsesStringTable("EntityNames")
     @OnTickStart
@@ -178,9 +189,7 @@ public class Main {
                                 String item_name = getEntityNameByHandle(item_id, entities, stringTable);
                                 sb.append(',');
                                 sb.append(item_name);
-                                // sb.append(item_id);
                             }
-                            // log.info("tick {}, entity {}: {}, {}, {}, {}, {}, {}, {}, {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), item1, item2, item3, item4, item5, item6, item7, item8, item9);
                             sb.append('\n');
                             item_writer.write(sb.toString());    
                         }

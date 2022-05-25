@@ -52,4 +52,9 @@ jobs:
           distribution: 'adopt'
       - name: Build with Maven
         working-directory: final/data_collector
-        run: mvn -P item_all package
+        run: |
+          mvn -P cursor_all package
+          mvn -P info package
+          mvn -P item_all package
+          mvn -P item_change package
+          mvn -P unit_orders package

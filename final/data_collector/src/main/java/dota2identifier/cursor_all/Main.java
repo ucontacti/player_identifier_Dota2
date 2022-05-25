@@ -38,7 +38,10 @@ import java.util.*;
 import java.io.File;
 import java.io.PrintWriter;
 
-
+/**
+ * Class to collect all the cursor data for each
+ * player given a replay
+ */
 public class Main {
 
     private final Logger log = LoggerFactory.getLogger(Main.class.getPackage().getClass());
@@ -47,7 +50,6 @@ public class Main {
     public static final int DIRE = 3;
     private boolean running = false;
 
-    // TODO: Improve hero recognition
     private boolean isHero(Entity e) {
         if (e.getDtClass().getDtName().equals("CDOTA_Unit_Hero_Beastmaster_Hawk"))
             return false;
@@ -104,18 +106,10 @@ public class Main {
     public void onCreated(Entity e) {
         if (running)
         {
-            // if(isHero(e))
-            //     if (0 <= Integer.parseInt(e.getProperty("m_iPlayerID"))  && Integer.parseInt(e.getProperty("m_iPlayerID")) <= 9)
             if (isHero(e)) {
-                // System.out.print("bruh");
                 Integer id = e.getProperty("m_iPlayerID");
                 heroHashtbl.put(id, e.getDtClass().getDtName());
-                // ent_list.add(e);
             }     
-            // if(e.getDtClass().getDtName().equals("CDOTAPlayer") && isHero(e))
-            // {
-            //     System.out.println("obj");
-            // }
         }
     }
 
@@ -155,6 +149,13 @@ public class Main {
         }
     }
 
+    /**
+     * The most important method that every tick for
+     * every hero records the tick, X and Y of the
+     * cursor on the screen
+     * @param ctx
+     * @param synthetic
+     */
     @UsesEntities
     @UsesStringTable("EntityNames")
     @OnTickStart
@@ -169,17 +170,11 @@ public class Main {
 
             for (Entity et: ent_list)
             {
-                // if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
-                // {
-                //     log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                // }
 
                 if(et.getDtClass().getDtName().equals("CDOTAPlayer"))
                 {
                     if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
                     {
-                        // log.info("tick {}, entity {}: {}, {}", tick, heroHashtbl.get(et.getProperty("m_iPlayerID")), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
-                        // log.info("tick {}, entity {}: {} {}", tick, et.getProperty("m_iPlayerID"), et.getProperty("m_iCursor.0000"), et.getProperty("m_iCursor.0001"));
                         StringBuilder sb = new StringBuilder();
                         sb.append(tick);
                         sb.append(',');
@@ -254,16 +249,6 @@ public class Main {
                 if (isGamePlayer(playerEntity))
                 {
                     ent_list.add(playerEntity);
-                    // int playerID = getEntityProperty(playerEntity, "m_iPlayerID");
-                    // System.out.println(playerID);
-                    // int heroID = resolveValue(ctx, "CDOTA_PlayerResource", "m_vecPlayerTeamData.%i.m_nSelectedHeroID", playerID, 0, 0);
-                    // System.out.println(heroID);
-                    // int selectedHero = resolveValue(ctx, "CDOTA_PlayerResource", "m_vecPlayerTeamData.%i.m_hSelectedHero", playerID, 0, 0);
-                    // System.out.println(selectedHero);
-                    // long steamID =  resolveValue(ctx, "CDOTA_PlayerResource", "m_vecPlayerData.%i.m_iPlayerSteamID", playerID, 0, 0);
-                    // System.out.println(steamID);
-                    // int teamNum = getEntityProperty(playerEntity, "m_iTeamNum");
-                    // System.out.println(teamNum);
                 }
             }
         }    

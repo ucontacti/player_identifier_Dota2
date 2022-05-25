@@ -87,21 +87,9 @@
 
     <profiles>
         <profile>
-            <id>click</id>
-            <properties>
-                <exampleName>click</exampleName>
-            </properties>
-        </profile>
-        <profile>
             <id>cursor_all</id>
             <properties>
                 <exampleName>cursor_all</exampleName>
-            </properties>
-        </profile>
-        <profile>
-            <id>cursor_change</id>
-            <properties>
-                <exampleName>cursor_change</exampleName>
             </properties>
         </profile>
         <profile>
@@ -129,5 +117,4 @@
             </properties>
         </profile>
     </profiles>
-
 </project>
