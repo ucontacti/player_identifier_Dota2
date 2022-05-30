@@ -4,37 +4,46 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import numpy as np 
 import pandas as pd
 from sklearn.model_selection import train_test_split #for split the data
-
 from sklearn.model_selection import cross_validate #score evaluation
 
 # In[1]: Other stuff
-df_cursor = pd.read_csv("cursor.csv")
+
+df_cursor = pd.read_csv("better_trainer/cursor.csv")
 df_cursor = df_cursor[df_cursor['Tick'] > 29999]
-df_unit_order = pd.read_csv("unit_order.csv")
+df_unit_order = pd.read_csv("better_trainer/unit_order.csv")
 df_unit_order = df_unit_order[df_unit_order['Tick'] > 29999]
 df_unit_order.drop_duplicates(inplace=True)
 df_unit_order.replace({"Action": {'M': 1, 'A': 2, 'S': 3},}, inplace=True)
-df_match_info = pd.read_csv("info.csv")
+df_match_info = pd.read_csv("better_trainer/info.csv")
 dfs_cursor = [rows for _, rows in df_cursor.groupby('Hero')]
 dfs_unit_order = [rows for _, rows in df_unit_order.groupby('Hero')]
 for hero in dfs_unit_order:
     steam_id = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["SteamId"]
-    if steam_id != 76561198085066985:
-        continue
+    #if steam_id != 76561198085066985:
+    #    continue
     hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
     hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
-    df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
+#    df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
+    try:
+        df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
+    except:
+        continue
 
     cols = ["X", "Y"]
+    # df_hero_cursor.drop("S", axis=0, inplace=True)
     df_hero_tmp = df_hero_cursor.loc[(df_hero_cursor[cols].shift(-1) != df_hero_cursor[cols]).any(axis=1)]
     df_hero_tmp["seq"] = df_hero_tmp["Tick"].diff()
     tbd_index = pd.cut(df_hero_tmp[df_hero_tmp["seq"] > 10]["Tick"], hero["Tick"].values).drop_duplicates(keep="last").index.values[:-1]
     df_hero_cursor["Action"] = pd.cut(df_hero_cursor["Tick"], bins=hero["Tick"].values, labels=hero["Action"].iloc[1:].values, ordered=False)
     df_hero_cursor["Action"] = pd.to_numeric(df_hero_cursor["Action"])
     df_hero_cursor["range"] = pd.cut(df_hero_cursor["Tick"], hero["Tick"].values)
+    
     for rm in tbd_index:
         df_hero_cursor.drop(df_hero_cursor[(df_hero_cursor.loc[rm]["range"].left <= df_hero_cursor["Tick"]) & (df_hero_cursor["Tick"] <= df_hero_cursor.loc[rm]["Tick"])].index, inplace=True)
     df_hero_cursor.dropna(inplace=True)
+    print("bruh")
+    df_hero_cursor.drop("S", axis=0, inplace=True)
+
 
     df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
     df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
@@ -128,7 +137,6 @@ for hero in dfs_unit_order:
     atomic_order.drop(atomic_order[atomic_order["Tick"] < 8].index, inplace = True)
     atomic_order["Steam_id"] = steam_id
     atomic_order["Hero"] = hero_name
-    df_hero_cursor.drop("S", axis=0, inplace=True)
     
 
 
