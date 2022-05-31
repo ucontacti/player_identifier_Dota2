@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup as soup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
-import sys
 import os
 
 
@@ -156,22 +155,19 @@ def player_link(my_url, webdriver_path):
     return link_list
 
 
-if __name__ == "__main__":
+def scrape(chromedriver_path, num_player): # TODO: num_player limit
     new_players = []
-    if len(sys.argv) < 2 or not os.path.exists(sys.argv[1]):
-        print("chromedriver not found!")
-    else:
-        chromium_path = sys.argv[1]
-        if os.path.exists('player_index.txt'):
-            with open('player_index.txt', 'r') as filehandle:
-                for line in filehandle:
-                    currentPlace = line[:-1]
-                    new_players.append(currentPlace)
-        for hero_link in DOTABUFF_HEROES:
-            print(hero_link)
-            new_players.extend(player_link(hero_link, chromium_path))
-            print("Done!")
-        new_players = list(set(new_players))
-        with open('player_index.txt', 'a') as filehandle:
-            for listitem in new_players:
-                filehandle.write('%s\n' % listitem)
+    chromium_path = chromedriver_path
+    if os.path.exists('player_index.txt'):
+        with open('player_index.txt', 'r') as filehandle:
+            for line in filehandle:
+                currentPlace = line[:-1]
+                new_players.append(currentPlace)
+    for hero_link in DOTABUFF_HEROES:
+        print(hero_link)
+        new_players.extend(player_link(hero_link, chromium_path))
+        print("Done!")
+    new_players = list(set(new_players))
+    with open('player_index.txt', 'a') as filehandle:
+        for listitem in new_players:
+            filehandle.write('%s\n' % listitem)
