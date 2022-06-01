@@ -2,3 +2,4 @@ bs4
 beautifulsoup4
 selenium
 typer
+pandas
