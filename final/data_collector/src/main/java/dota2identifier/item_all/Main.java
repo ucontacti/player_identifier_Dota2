@@ -229,7 +229,7 @@ public class Main {
                 tick_rate = 30;
             }
         }
-        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_item_all.csv";
+        String output = "../features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ys/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_item_all.csv";
         item_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
         sb.append("Tick");

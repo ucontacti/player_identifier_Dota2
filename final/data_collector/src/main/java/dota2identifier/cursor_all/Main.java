@@ -221,7 +221,7 @@ public class Main {
                 tick_rate = 1;
             }
         }
-        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_cursor_tmp.csv";
+        String output = "../features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ys/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_cursor_tmp.csv";
         
         mouse_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();

@@ -125,7 +125,7 @@ public class Main {
     public void run(String[] args) throws Exception {
         String rep_pwd = args[0];
 
-        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_item_change_tmp.csv";
+        String output = "../features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ys/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_item_change_tmp.csv";
         
         item_updater = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();

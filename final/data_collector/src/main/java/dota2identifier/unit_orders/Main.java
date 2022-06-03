@@ -231,7 +231,7 @@ public class Main {
 
     public void runControlled(String[] args) throws Exception {
         String rep_pwd = args[0];
-        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order_v2.csv";
+        String output = "../features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ys/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order_v2.csv";
         
         action_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();

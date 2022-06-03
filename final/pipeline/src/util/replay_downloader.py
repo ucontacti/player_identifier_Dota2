@@ -30,5 +30,4 @@ def replay_download(match_id_list):
             continue
         new_value.append(1)
         print(f"Downloaded replay {counter}")
-        counter += 1
     return new_value

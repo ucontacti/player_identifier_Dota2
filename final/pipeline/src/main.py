@@ -22,11 +22,11 @@ def player_id_scrapper(driver_path: str = typer.Option(..., "--driver_path", "-d
 
 @app.command()
 def pipeline(fetch_new: bool = False):
+    if not exists(REPLAY_TRACKER_PATH):
+        create_empty_replay_tracker()
     if fetch_new:
         typer.echo("adding new replays to pipline.")
         add_replay_to_pipeline()
-    if not exists(REPLAY_TRACKER_PATH):
-        create_empty_replay_tracker()
     update_pipeline()
     
 

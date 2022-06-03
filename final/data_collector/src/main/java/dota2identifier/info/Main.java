@@ -147,7 +147,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         String test = args[0];
-        String output = "features/" + test.substring(test.lastIndexOf("ds/") + 3, test.lastIndexOf("s/") + 12) + "_info.csv";
+        String output = "../features/" + test.substring(test.lastIndexOf("ys/") + 3, test.lastIndexOf("s/") + 12) + "_info.csv";
         PrintWriter info_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
         sb.append("SteamId");

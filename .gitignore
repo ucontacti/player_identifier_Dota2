@@ -5,4 +5,5 @@
 /.project
 /*.iml
 /replays
+/replay_downloader
 /dependency-reduced-pom.xml

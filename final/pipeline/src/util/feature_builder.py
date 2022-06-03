@@ -1,9 +1,8 @@
 import subprocess
 import shutil
-import os
 
-REPLAY_PATH = "../resources/downloaded_replays/"
-JAVA_TARGET_PATH = "../../data_collection/target/"
+REPLAY_PATH = "../resources/downloaded_replays"
+JAVA_TARGET_PATH = "../../data_collector/target"
 def replay_decompress(match_id_list):
     new_val = []
     for match in match_id_list:
@@ -12,7 +11,7 @@ def replay_decompress(match_id_list):
             output = subprocess.run(['bzip2', '-dk', filename],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                     check=True)
-            shutil.move(f"{REPLAY_PATH}{match}.dem", f"{REPLAY_PATH}{match}.dem")
+            # shutil.move(f"{REPLAY_PATH}{match}.dem", f"{REPLAY_PATH}{match}.dem")
             print(output)
         except Exception as e:
             new_val.append(-3)
@@ -98,7 +97,7 @@ def cursor_data(match_id_list, tickrate = 1):
             output = subprocess.run(['java', '-jar', f'{JAVA_TARGET_PATH}/cursor_all.one-jar.jar', filename, str(tickrate)],         
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 check=True)
-            shutil.move("java/features/" + match + "_cursor_tmp.csv", "java/features/" + match + "_cursor_tmp_"  + tickrate + "_tick.csv")
+            shutil.move(f"../features/{match}_cursor_tmp.csv", f"../features/{match}_cursor_tmp_{tickrate}_tick.csv")
             print(output)
         except Exception as e:
             new_val.append(-8)
