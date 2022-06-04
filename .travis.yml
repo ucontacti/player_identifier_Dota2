@@ -4,7 +4,7 @@ jobs:
 # Java step
     - language: java
       before_script:
-        - cd data_collector
+        - cd replay_parser
         - mkdir features
       script: 
         - mvn -P item_all package

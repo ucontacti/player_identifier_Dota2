@@ -8,7 +8,7 @@ from util.replay_downloader import replay_download
 from util.feature_builder import replay_decompress, game_info,        \
                    unit_order, item_change, item_all,   \
                    cursor_data
-# from atomic_feature_extractor import atomic_feature
+from util.atomic_feature_extractor import atomic_feature
 REPLAY_TRACKER_PATH = "../resources/replay_tracker.csv"
 PLAYER_ID_PATH = "../resources/player_index.txt"
 
@@ -48,10 +48,8 @@ def add_replay_to_pipeline():
     replay_tracker = pd.read_csv(REPLAY_TRACKER_PATH)
     players_id = open(PLAYER_ID_PATH, "r").read().split("\n")
     new_replays = []
-    counter = 1
-    for player in players_id:
+    for counter, player in enumerate(players_id):
         hero, replay_list = list_replay_by_match_id(player)
-        counter += 1
         for replay in replay_list:
             if replay not in replay_tracker["replay_id"].values:
                 new_dict = {
@@ -113,32 +111,34 @@ def update_pipeline():
        tickrate_column = str(tickrate) + "_tick"
        replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
        replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
-    new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['5_tick'] == False), 'replay_id'].tolist(), 5)
-    if (new_val):
-       replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
-       tickrate_column = str(tickrate) + "_tick"
-       replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
-       replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
-    new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['10_tick'] == False), 'replay_id'].tolist(), 10)
-    if (new_val):
-       replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
-       tickrate_column = str(tickrate) + "_tick"
-       replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
-       replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
-    new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['15_tick'] == False), 'replay_id'].tolist(), 15)
-    if (new_val):
-       replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
-       tickrate_column = str(tickrate) + "_tick"
-       replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
-       replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
-    new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['30_tick'] == False), 'replay_id'].tolist(), 30)
-    if (new_val):
-       replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
-       tickrate_column = str(tickrate) + "_tick"
-       replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
-       replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
+    
+    
+    # new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['5_tick'] == False), 'replay_id'].tolist(), 5)
+    # if (new_val):
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
+    #    tickrate_column = str(tickrate) + "_tick"
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
+    #    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
+    # new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['10_tick'] == False), 'replay_id'].tolist(), 10)
+    # if (new_val):
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
+    #    tickrate_column = str(tickrate) + "_tick"
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
+    #    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
+    # new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['15_tick'] == False), 'replay_id'].tolist(), 15)
+    # if (new_val):
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
+    #    tickrate_column = str(tickrate) + "_tick"
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
+    #    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
+    # new_val, tickrate = cursor_data(replay_tracker.loc[(replay_tracker['state'] == 7) & (replay_tracker['30_tick'] == False), 'replay_id'].tolist(), 30)
+    # if (new_val):
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
+    #    tickrate_column = str(tickrate) + "_tick"
+    #    replay_tracker.loc[(replay_tracker['state'] == 7),tickrate_column] = True
+    #    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
-    # new_val = atomic_feature(replay_tracker.loc[(replay_tracker['state'] == 7), 'replay_id'].tolist(), 1)
-    # replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
+    new_val = atomic_feature(replay_tracker.loc[(replay_tracker['state'] == 7), 'replay_id'].tolist())
+    replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
     
     replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)

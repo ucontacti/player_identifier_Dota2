@@ -2,7 +2,7 @@ import subprocess
 import shutil
 
 REPLAY_PATH = "../resources/downloaded_replays"
-JAVA_TARGET_PATH = "../../data_collector/target"
+JAVA_TARGET_PATH = "../../replay_parser/target"
 def replay_decompress(match_id_list):
     new_val = []
     for match in match_id_list:
