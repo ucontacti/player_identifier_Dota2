@@ -134,7 +134,6 @@ def atomic_feature(authentic_match_id):
                     break
             atomic_order.to_csv(f"../resources/trainable_features/combo/{steam_id}|{hero_name}.csv", index=False)
 
-
         print(f"batch {counter}/{len(authentic_match_id)}")
         new_val.append(8)
     return new_val

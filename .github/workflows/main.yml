@@ -51,7 +51,7 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Build data collector
-        working-directory: final/data_collector
+        working-directory: final/replay_parser
         run: |
           mvn -P cursor_all package
           mvn -P info package
