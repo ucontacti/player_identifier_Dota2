@@ -1,4 +1,3 @@
-from msilib.schema import Class
 from matplotlib.pyplot import axis, clf
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score  #for accuracy_score and precision_score
 import numpy as np 
@@ -20,15 +19,15 @@ from scipy.interpolate import interp1d #for eer
 
 class Classifier:
     def __init__(self) -> None:
-        self.__load_data()
+        # self.__load_data()
         pass
 
-    def select_model(self, model_name: str) -> None:
-        if model_name == "Logostic Regression":
+    def select_model(self, model_name: int) -> None:
+        if model_name == "1":
             self.clf = LogisticRegression()
-        elif model_name == "Random Forest":
+        elif model_name == "2":
             self.clf = RandomForestClassifier()
-        elif model_name == "Decision Tree":
+        elif model_name == "3":
             self.clf = DecisionTreeClassifier()
         else:
             pass
@@ -63,6 +62,7 @@ class Classifier:
             result_dict["eer"].append(result_rm["test_eer"].mean())
             result_values[player, hero_name] = round(result_rm["test_f1"].mean()*100,2)
             print(f"batch {counter}")
+            self.estimator = result_rm["estimator"]
         # print(model_name + " results --------------------------------------------------------")
         print("accuracy: " + str(sum(result_dict["accuracy"]) / len(result_dict["accuracy"])))
         print("precision: " + str(sum(result_dict["precision"]) / len(result_dict["precision"])))
@@ -71,8 +71,7 @@ class Classifier:
         print("roc: " + str(sum(result_dict["roc"]) / len(result_dict["roc"])))
         print("eer: " + str(sum(result_dict["eer"]) / len(result_dict["eer"])))
         print(result_values)
-        self.estimator = result_rm["estimator"]
-        return result_dict, result_values
+        # return result_dict, result_values
 
 
     def __load_data(self) -> None:

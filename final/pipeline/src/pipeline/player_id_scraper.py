@@ -5,7 +5,6 @@ from time import sleep
 from os.path import exists
 
 
-
 DOTABUFF_HEROES=[
     "https://www.dotabuff.com/heroes/abaddon/players",
     "https://www.dotabuff.com/heroes/alchemist/players",
