@@ -1,4 +1,3 @@
-from matplotlib.pyplot import axis, clf
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score  #for accuracy_score and precision_score
 import numpy as np 
 import pandas as pd
