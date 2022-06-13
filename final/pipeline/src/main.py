@@ -7,6 +7,7 @@ from pipeline.pipeline_handler import add_replay_to_pipeline, \
                                       create_empty_replay_tracker
 from pipeline.player_id_scraper import scrape
 from model.movement_classifier import MovementClassifier
+from model.itemization_classifier import ItemizationClassifier
 
 REPLAY_TRACKER_PATH = "../resources/replay_tracker.csv"
 
