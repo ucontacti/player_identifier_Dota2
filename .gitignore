@@ -7,3 +7,6 @@
 /replays
 /replay_downloader
 /dependency-reduced-pom.xml
+final/resources/downloaded_replays/*
+final/resources/trainable_features/*
+final/replay_parser/target/*

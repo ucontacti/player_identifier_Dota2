@@ -1,3 +1,4 @@
+from final.pipeline.src.model.itemization_classifier import ItemizationClassifier
 import typer
 from os.path import exists
 
@@ -5,7 +6,7 @@ from pipeline.pipeline_handler import add_replay_to_pipeline, \
                                       update_pipeline, \
                                       create_empty_replay_tracker
 from pipeline.player_id_scraper import scrape
-from model.classifier import Classifier
+from model.movement_classifier import MovementClassifier
 
 REPLAY_TRACKER_PATH = "../resources/replay_tracker.csv"
 
@@ -29,9 +30,25 @@ def pipeline(fetch_new: bool = False):
     update_pipeline()
 
 @app.command()
-def model(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
+def mouse_movement(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
         show_default=True):
-    model = Classifier()
+    model = MovementClassifier()
+    model.select_model(model_num)
+    model.train_and_eval()
+    sure = typer.confirm("Do you want to calculate coefficiency?")
+    if sure:
+        model.calculate_coefficiency()
+    sure = typer.confirm("Do you want to plot results?")
+    if sure:
+        model.plot_data()
+    sure = typer.confirm("Do you want to save model?")
+    if sure:
+        model.save_model()    
+
+@app.command()
+def itemization(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
+        show_default=True):
+    model = ItemizationClassifier()
     model.select_model(model_num)
     model.train_and_eval()
     sure = typer.confirm("Do you want to calculate coefficiency?")

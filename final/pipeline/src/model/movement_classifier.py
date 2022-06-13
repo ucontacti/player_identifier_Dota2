@@ -5,8 +5,6 @@ from sklearn.model_selection import train_test_split #for split the data
 
 from sklearn.model_selection import cross_validate #score evaluation
 from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model import SGDClassifier
-from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import preprocessing
@@ -16,9 +14,9 @@ from sklearn.metrics import make_scorer, roc_curve #for eer
 from scipy.optimize import brentq #for eer
 from scipy.interpolate import interp1d #for eer
 
-class Classifier:
+class MovementClassifier:
     def __init__(self) -> None:
-        # self.__load_data()
+        # self.__load_movement_data()
         pass
 
     def select_model(self, model_name: int) -> None:
@@ -73,7 +71,7 @@ class Classifier:
         # return result_dict, result_values
 
 
-    def __load_data(self) -> None:
+    def __load_movement_data(self) -> None:
         tmp_df_holder = []
         for file in glob("../resources/trainable_features/combo/*.csv"):
             df = pd.read_csv(file, index_col=None, header=0)
