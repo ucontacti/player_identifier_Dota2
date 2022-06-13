@@ -58,3 +58,4 @@ jobs:
           mvn -P item_all package
           mvn -P item_change package
           mvn -P unit_orders package
+          mvn -P stats package

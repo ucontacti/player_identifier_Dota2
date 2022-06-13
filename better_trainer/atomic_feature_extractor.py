@@ -8,13 +8,13 @@ from sklearn.model_selection import cross_validate #score evaluation
 
 # In[1]: Other stuff
 
-df_cursor = pd.read_csv("better_trainer/cursor.csv")
+df_cursor = pd.read_csv("cursor.csv")
 df_cursor = df_cursor[df_cursor['Tick'] > 29999]
-df_unit_order = pd.read_csv("better_trainer/unit_order.csv")
+df_unit_order = pd.read_csv("unit_order.csv")
 df_unit_order = df_unit_order[df_unit_order['Tick'] > 29999]
 df_unit_order.drop_duplicates(inplace=True)
 df_unit_order.replace({"Action": {'M': 1, 'A': 2, 'S': 3},}, inplace=True)
-df_match_info = pd.read_csv("better_trainer/info.csv")
+df_match_info = pd.read_csv("info.csv")
 dfs_cursor = [rows for _, rows in df_cursor.groupby('Hero')]
 dfs_unit_order = [rows for _, rows in df_unit_order.groupby('Hero')]
 for hero in dfs_unit_order:
@@ -41,42 +41,40 @@ for hero in dfs_unit_order:
     for rm in tbd_index:
         df_hero_cursor.drop(df_hero_cursor[(df_hero_cursor.loc[rm]["range"].left <= df_hero_cursor["Tick"]) & (df_hero_cursor["Tick"] <= df_hero_cursor.loc[rm]["Tick"])].index, inplace=True)
     df_hero_cursor.dropna(inplace=True)
-    print("bruh")
-    df_hero_cursor.drop("S", axis=0, inplace=True)
 
-
-    df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
-    df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
+    df_hero_cursor["Tick_diff"] = df_hero_cursor["Tick"].diff()
+    df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick_diff"]
+    df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick_diff"]
     df_hero_cursor["V"] = np.sqrt(df_hero_cursor["V_X"]**2 + df_hero_cursor["V_Y"]**2)
     df_hero_cursor["S"] = np.sqrt(df_hero_cursor["X"].diff()**2 + df_hero_cursor["Y"].diff()**2)
     # df_hero_cursor.fillna({"S":0}, inplace=True)
     # df_hero_cursor["S"] = np.cumsum(df_hero_cursor["S"])
-    df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick"].diff()
-    df_hero_cursor["A_X"] = df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick"].diff()
-    df_hero_cursor["A_Y"] = df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick"].diff()
-    df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick"].diff()
+    df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick_diff"]
+    df_hero_cursor["A_X"] = df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick_diff"]
+    df_hero_cursor["A_Y"] = df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick_diff"]
+    df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick_diff"]
     df_hero_cursor["AoM"] = np.arctan2(df_hero_cursor["Y"], df_hero_cursor["X"])
     df_hero_cursor["AoM"] = df_hero_cursor["AoM"].diff()
     # df_hero_cursor.fillna({"AoM":0}, inplace=True)
     # df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
-    df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"] / df_hero_cursor["Tick"].diff()
+    df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"] / df_hero_cursor["Tick_diff"]
     df_hero_cursor["Cur"] = df_hero_cursor["AoM"] / df_hero_cursor["S"]
     df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"]
     df_hero_cursor["Y_diff"] = df_hero_cursor["Y"].diff()
     df_hero_cursor["X_diff"] = df_hero_cursor["X"].diff()
     df_hero_cursor["TCM"] = df_hero_cursor["Tick"] * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-    df_hero_cursor["SC"] = (df_hero_cursor["Tick"].diff() ** 2) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-    df_hero_cursor["M3"] = (df_hero_cursor["Tick"].diff() ** 3) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
-    df_hero_cursor["M4"] = (df_hero_cursor["Tick"].diff() ** 4) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
+    df_hero_cursor["SC"] = (df_hero_cursor["Tick"] ** 2) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
+    df_hero_cursor["M3"] = (df_hero_cursor["Tick"] ** 3) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
+    df_hero_cursor["M4"] = (df_hero_cursor["Tick"] ** 4) * np.sqrt(df_hero_cursor["X_diff"] ** 2 + df_hero_cursor["Y_diff"] ** 2)
     df_hero_cursor["TCrv"] =    (df_hero_cursor["V_X"] * df_hero_cursor["A_Y"] 
                                 - df_hero_cursor["V_Y"] * df_hero_cursor["A_X"])\
                                 / np.power(df_hero_cursor["V_X"] ** 2 + df_hero_cursor["V_Y"] ** 2, 1.5)
     df_hero_cursor["VCrv"] = df_hero_cursor["J"] / np.power(1 + df_hero_cursor["A"] ** 2, 1.5)
-    print("bruh")
     df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0, "Y_diff":0, "X_diff":0}, inplace=True)
     atomic_order = df_hero_cursor.groupby("range").agg(
-        Tick=("Tick", "count"), 
-        distance=("S", "sum"), 
+        Tick_first=("Tick", "first"),
+        Tick_last=("Tick", "last"),
+        distance=("S", "sum"),
         Action=("Action", "first"),
         X_first=("X", "first"),
         X_last=("X", "last"),
@@ -127,6 +125,7 @@ for hero in dfs_unit_order:
         Cur_cr_mean=("Cur_cr", "mean"),
         Cur_cr_std=("Cur_cr", "std")
         ).fillna(0).replace([np.inf, -np.inf], 0)
+    atomic_order["Tick"] = atomic_order["Tick_last"] - atomic_order["Tick_first"]
     atomic_order["S"] = np.sqrt((atomic_order["X_first"] - atomic_order["X_last"]) ** 2 + (atomic_order["Y_first"] - atomic_order["Y_last"]) ** 2) / atomic_order["distance"]
     atomic_order["TCM"] = atomic_order["TCM"] / atomic_order["distance"]
     atomic_order["SC"] = atomic_order["SC"] / atomic_order["distance"] - atomic_order["TCM"] ** 2
@@ -135,6 +134,10 @@ for hero in dfs_unit_order:
     atomic_order.drop("X_diff", axis=1 ,inplace=True)
     atomic_order.drop("Y_diff", axis=1 ,inplace=True)
     atomic_order.drop(atomic_order[atomic_order["Tick"] < 8].index, inplace = True)
+    atomic_order.drop("Tick_first", axis=1 ,inplace=True)
+    atomic_order.drop("Tick_last", axis=1 ,inplace=True)
+    print("bruh")
+    atomic_order.drop("S", axis=0, inplace=True)
     atomic_order["Steam_id"] = steam_id
     atomic_order["Hero"] = hero_name
     
@@ -191,21 +194,22 @@ for match_id in authentic_match_id:
             df_hero_cursor.drop(df_hero_cursor[(df_hero_cursor.loc[rm]["range"].left <= df_hero_cursor["Tick"]) & (df_hero_cursor["Tick"] <= df_hero_cursor.loc[rm]["Tick"])].index, inplace=True)
         
         df_hero_cursor.dropna(inplace=True)
-        df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick"].diff()
-        df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["Tick_diff"] = df_hero_cursor["Tick"].diff()
+        df_hero_cursor["V_X"] = df_hero_cursor["X"].diff() / df_hero_cursor["Tick_diff"]
+        df_hero_cursor["V_Y"] = df_hero_cursor["Y"].diff() / df_hero_cursor["Tick_diff"]
         df_hero_cursor["V"] = np.sqrt(df_hero_cursor["V_X"]**2 + df_hero_cursor["V_Y"]**2)
         df_hero_cursor["S"] = np.sqrt(df_hero_cursor["X"].diff()**2 + df_hero_cursor["Y"].diff()**2)
         # df_hero_cursor.fillna({"S":0}, inplace=True)
         # df_hero_cursor["S"] = np.cumsum(df_hero_cursor["S"])
-        df_hero_cursor["A_X"] = df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick"].diff()
-        df_hero_cursor["A_Y"] = df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick"].diff()
-        df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick"].diff()
-        df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["A_X"] = df_hero_cursor["V_X"].diff() / df_hero_cursor["Tick_diff"]
+        df_hero_cursor["A_Y"] = df_hero_cursor["V_Y"].diff() / df_hero_cursor["Tick_diff"]
+        df_hero_cursor["A"] = df_hero_cursor["V"].diff() / df_hero_cursor["Tick_diff"]
+        df_hero_cursor["J"] = df_hero_cursor["A"].diff() / df_hero_cursor["Tick_diff"]
         df_hero_cursor["AoM"] = np.arctan2(df_hero_cursor["Y"], df_hero_cursor["X"])
         df_hero_cursor["AoM"] = df_hero_cursor["AoM"].diff()
         # df_hero_cursor.fillna({"AoM":0}, inplace=True)
         # df_hero_cursor["AoM"] = np.cumsum(df_hero_cursor["AoM"])
-        df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"] / df_hero_cursor["Tick"].diff()
+        df_hero_cursor["Ang_V"] = df_hero_cursor["AoM"] / df_hero_cursor["Tick_diff"]
         df_hero_cursor["Cur"] = df_hero_cursor["AoM"] / df_hero_cursor["S"]
         df_hero_cursor["Cur_cr"] = df_hero_cursor["Cur"].diff() / df_hero_cursor["S"]
         df_hero_cursor["Y_diff"] = df_hero_cursor["Y"].diff()
@@ -220,8 +224,9 @@ for match_id in authentic_match_id:
         df_hero_cursor["VCrv"] = df_hero_cursor["J"] / np.power(1 + df_hero_cursor["A"] ** 2, 1.5)
         df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0, "Y_diff":0, "X_diff":0}, inplace=True)
         atomic_order = df_hero_cursor.groupby("range").agg(
-            Tick=("Tick", "count"), 
-            distance=("S", "sum"), 
+            Tick_first=("Tick", "first"),
+            Tick_last=("Tick", "last"),
+            distance=("S", "sum"),
             Action=("Action", "first"),
             X_first=("X", "first"),
             X_last=("X", "last"),
@@ -273,6 +278,7 @@ for match_id in authentic_match_id:
             Cur_cr_std=("Cur_cr", "std")
             ).fillna(0).replace([np.inf, -np.inf], 0)
         
+        atomic_order["Tick"] = atomic_order["Tick_last"] - atomic_order["Tick_first"]
         atomic_order["S"] = np.sqrt((atomic_order["X_first"] - atomic_order["X_last"]) ** 2 + (atomic_order["Y_first"] - atomic_order["Y_last"]) ** 2) / atomic_order["distance"]
         atomic_order["TCM"] = atomic_order["TCM"] / atomic_order["distance"]
         atomic_order["SC"] = atomic_order["SC"] / atomic_order["distance"] - atomic_order["TCM"] ** 2
@@ -281,6 +287,8 @@ for match_id in authentic_match_id:
         
         atomic_order.drop("X_diff", axis=1 ,inplace=True)
         atomic_order.drop("Y_diff", axis=1 ,inplace=True)
+        atomic_order.drop("Tick_first", axis=1 ,inplace=True)
+        atomic_order.drop("Tick_last", axis=1 ,inplace=True)
         atomic_order.drop(atomic_order[atomic_order["Tick"] < 8].index, inplace = True)
         atomic_order["Steam_id"] = steam_id
         atomic_order["Hero"] = hero_name

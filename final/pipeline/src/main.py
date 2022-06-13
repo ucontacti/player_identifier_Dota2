@@ -27,7 +27,7 @@ def pipeline(fetch_new: bool = False):
         typer.echo("adding new replays to pipline.")
         add_replay_to_pipeline()
     update_pipeline()
-    
+
 @app.command()
 def model(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
         show_default=True):
