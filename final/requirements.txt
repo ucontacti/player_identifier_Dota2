@@ -3,3 +3,5 @@ beautifulsoup4
 selenium
 typer
 pandas
+scikit-learn
+scipy
