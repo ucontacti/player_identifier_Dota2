@@ -23,14 +23,13 @@ for hero in dfs_unit_order:
     #    continue
     hero_name = df_match_info.loc[df_match_info["Hero"] == hero["Hero"].iloc[0]].iloc[0]["Hero"]
     hero = hero.groupby(hero['Tick']).aggregate({'Action': 'max'}).reset_index()
-#    df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
+#   df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
     try:
         df_hero_cursor = list(filter(lambda x: x.iloc[0]["Hero"] == hero_name, dfs_cursor))[0]
     except:
         continue
 
     cols = ["X", "Y"]
-    # df_hero_cursor.drop("S", axis=0, inplace=True)
     df_hero_tmp = df_hero_cursor.loc[(df_hero_cursor[cols].shift(-1) != df_hero_cursor[cols]).any(axis=1)]
     df_hero_tmp["seq"] = df_hero_tmp["Tick"].diff()
     tbd_index = pd.cut(df_hero_tmp[df_hero_tmp["seq"] > 10]["Tick"], hero["Tick"].values).drop_duplicates(keep="last").index.values[:-1]
@@ -70,7 +69,7 @@ for hero in dfs_unit_order:
                                 - df_hero_cursor["V_Y"] * df_hero_cursor["A_X"])\
                                 / np.power(df_hero_cursor["V_X"] ** 2 + df_hero_cursor["V_Y"] ** 2, 1.5)
     df_hero_cursor["VCrv"] = df_hero_cursor["J"] / np.power(1 + df_hero_cursor["A"] ** 2, 1.5)
-    df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0, "Y_diff":0, "X_diff":0}, inplace=True)
+    # df_hero_cursor.fillna({"V_X":0, "V_Y":0, "V":0, "A":0, "J":0, "AoM":0, "Ang_V":0, "Cur":0, "Cur_cr":0, "Y_diff":0, "X_diff":0}, inplace=True)
     atomic_order = df_hero_cursor.groupby("range").agg(
         Tick_first=("Tick", "first"),
         Tick_last=("Tick", "last"),
@@ -124,7 +123,8 @@ for hero in dfs_unit_order:
         Cur_cr_max=("Cur_cr", "max"),
         Cur_cr_mean=("Cur_cr", "mean"),
         Cur_cr_std=("Cur_cr", "std")
-        ).fillna(0).replace([np.inf, -np.inf], 0)
+        # ).fillna(0).replace([np.inf, -np.inf], 0)
+        )
     atomic_order["Tick"] = atomic_order["Tick_last"] - atomic_order["Tick_first"]
     atomic_order["S"] = np.sqrt((atomic_order["X_first"] - atomic_order["X_last"]) ** 2 + (atomic_order["Y_first"] - atomic_order["Y_last"]) ** 2) / atomic_order["distance"]
     atomic_order["TCM"] = atomic_order["TCM"] / atomic_order["distance"]

@@ -78,20 +78,21 @@ import glob, os
 
 li = []
 
-os.chdir(os.getcwd() + "/trainable_features/combo/")
-counter = 1
-for file in glob.glob("*"):
-    df = pd.read_csv(file, index_col=None, header=0)
+files = glob.glob("trainable_features_1/combo/pickle*")
+for f in files:
+    df = pd.read_pickle(f)
+    df.drop(df[ df['Tick'] < 200 ].index, inplace=True)
+    df.drop(df[ df['Tick'] > 2000 ].index, inplace=True)
+    #df = pd.get_dummies(df,prefix=['Action'], columns = ['Action'])
     li.append(df)
-    if counter == 2000:
-        break
-    counter += 1
-
-
 X = pd.concat(li, axis=0, ignore_index=True)
+li.clear()
+
+#X.drop(X[ X['Tick'] < 8 ].index, inplace=True)
+X.fillna(0, inplace=True)
 steamer = X["Steam_id"].value_counts()
-X = X[X.groupby("Steam_id")["Steam_id"].transform('count').ge(9000)]
-print(steamer)
+X = X[X.groupby("Steam_id")["Steam_id"].transform('count').ge(steamer.iloc[5])]
+steamer = X["Steam_id"].value_counts()
 
 train(LogisticRegression(class_weight="balanced", max_iter = 1000), "Logistic Regression", steamer, X)
 train(RandomForestClassifier(class_weight="balanced"), "Random Forest", steamer, X)
