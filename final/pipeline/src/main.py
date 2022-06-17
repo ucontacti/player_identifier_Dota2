@@ -1,4 +1,3 @@
-from final.pipeline.src.model.itemization_classifier import ItemizationClassifier
 import typer
 from os.path import exists
 
