@@ -30,9 +30,10 @@ def pipeline(fetch_new: bool = False):
     update_pipeline()
 
 @app.command()
-def mouse_movement(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
+def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
         show_default=True):
-    model = MovementClassifier()
+    num_of_players = typer.Option(5, prompt="How many players do you want to classify?")
+    model = MovementClassifier(num_of_players)
     model.select_model(model_num)
     model.train_and_eval()
     sure = typer.confirm("Do you want to calculate coefficiency?")
@@ -49,17 +50,20 @@ def mouse_movement(model_num: int =typer.Option(1, prompt="What is the name of t
 def itemization(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
         show_default=True):
     model = ItemizationClassifier()
-    model.select_model(model_num)
-    model.train_and_eval()
-    sure = typer.confirm("Do you want to calculate coefficiency?")
-    if sure:
-        model.calculate_coefficiency()
-    sure = typer.confirm("Do you want to plot results?")
-    if sure:
-        model.plot_data()
-    sure = typer.confirm("Do you want to save model?")
-    if sure:
-        model.save_model()    
+    if  model.found_ESN():
+        model.select_model(model_num)
+        model.train_and_eval()
+        sure = typer.confirm("Do you want to calculate coefficiency?")
+        if sure:
+            model.calculate_coefficiency()
+        sure = typer.confirm("Do you want to plot results?")
+        if sure:
+            model.plot_data()
+        sure = typer.confirm("Do you want to save model?")
+        if sure:
+            model.save_model()
+    else:
+        print("Cannot load ESN!")
 
 if __name__ == "__main__":
     app()

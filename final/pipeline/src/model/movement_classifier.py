@@ -15,21 +15,27 @@ from scipy.optimize import brentq #for eer
 from scipy.interpolate import interp1d #for eer
 
 class MovementClassifier:
-    def __init__(self) -> None:
-        # self.__load_movement_data()
+    def __init__(self, num_of_players) -> None:
+        self.num_of_players = num_of_players
+        self.__load_movement_data()
         pass
 
     def select_model(self, model_name: int) -> None:
         if model_name == "1":
             self.clf = LogisticRegression()
+            self.model_name = "Logistic Regression"
         elif model_name == "2":
             self.clf = RandomForestClassifier()
+            self.model_name = "Random Forest"
         elif model_name == "3":
             self.clf = DecisionTreeClassifier()
+            self.model_name = "Decision Tree"
         else:
             pass
-
-    def train_and_eval(self, target, drop_list) -> None:
+        
+    def train_and_eval(self) -> None:
+        drop_list = ["Label", "Hero", "Steam_id", "Cur_cr_min", "Cur_cr_max", "Cur_cr_mean", "Cur_cr_std"]
+        target = self.data.value_counts()
         result_values = {}
         result_dict = {}
         result_dict["accuracy"] = []
@@ -60,14 +66,14 @@ class MovementClassifier:
             result_values[player, hero_name] = round(result_rm["test_f1"].mean()*100,2)
             print(f"batch {counter}")
             self.estimator = result_rm["estimator"]
-        # print(model_name + " results --------------------------------------------------------")
-        print("accuracy: " + str(sum(result_dict["accuracy"]) / len(result_dict["accuracy"])))
-        print("precision: " + str(sum(result_dict["precision"]) / len(result_dict["precision"])))
-        print("recall: " + str(sum(result_dict["recall"]) / len(result_dict["recall"])))
-        print("f1: " + str(sum(result_dict["f1"]) / len(result_dict["f1"])))
-        print("roc: " + str(sum(result_dict["roc"]) / len(result_dict["roc"])))
-        print("eer: " + str(sum(result_dict["eer"]) / len(result_dict["eer"])))
-        print(result_values)
+        print(f"{self.model_name} results for --------------------------------------------------------")
+        print(f"accuracy: {(sum(result_dict['accuracy']) / len(result_dict['accuracy']))}")
+        print(f"precision: {(sum(result_dict['precision']) / len(result_dict['precision']))}")
+        print(f"recall: {(sum(result_dict['recall']) / len(result_dict['recall']))}")
+        print(f"f1: {(sum(result_dict['f1']) / len(result_dict['f1']))}")
+        print(f"roc: {(sum(result_dict['roc']) / len(result_dict['roc']))}")
+        print(f"eer: {(sum(result_dict['eer']) / len(result_dict['eer']))}")
+        # print(result_values)
         # return result_dict, result_values
 
 
@@ -79,6 +85,8 @@ class MovementClassifier:
         self.data = pd.concat(tmp_df_holder, axis=0, ignore_index=True)
         tmp_df_holder.clear()
         self.data.fillna(0, inplace=True)
+        steamer = self.data["Steam_id"].value_counts()
+        self.data = self.data[self.data.groupby("Steam_id")["Steam_id"].transform('count').ge(steamer.iloc[self.num_of_players - 1])]
 
     def __preprocess(self) -> None:
         self.data = preprocessing.StandardScaler().fit(self.data).transform(self.data)

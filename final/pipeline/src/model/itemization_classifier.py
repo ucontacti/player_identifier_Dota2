@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import os
 from sklearn.model_selection import train_test_split #for split the data
-from ESN import *
 from sklearn.model_selection import cross_validate #score evaluation
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
@@ -14,24 +13,37 @@ from sklearn.metrics import make_scorer, roc_curve #for eer
 from scipy.optimize import brentq #for eer
 from scipy.interpolate import interp1d #for eer
 
+import importlib
+spam_spec = importlib.util.find_spec("util.ESN")
+found_ESN = spam_spec is not None
+if found_ESN:
+    from util.ESN import ESNTimeSeries, ESNVanilla
+
+
 REPLAY_TRACKER_PATH = "../resources/replay_tracker.csv"
 
 
 class ItemizationClassifier:
     def __init__(self) -> None:
-        # self.__create_esn()
-        pass
+        if found_ESN:
+            self.__create_esn()
+
+    def found_ESN(self) -> bool:
+        return found_ESN
 
     def select_model(self, model_name: int) -> None:
         if model_name == "1":
             self.clf = LogisticRegression()
+            self.model_name = "Logistic Regression"
         elif model_name == "2":
             self.clf = RandomForestClassifier()
+            self.model_name = "Random Forest"
         elif model_name == "3":
             self.clf = DecisionTreeClassifier()
+            self.model_name = "Decision Tree"
         else:
             pass
-
+        
     def __create_esn(self) -> None:
         replay_tracker = pd.read_csv(REPLAY_TRACKER_PATH)
         authentic_match_id = replay_tracker.loc[(replay_tracker['state'] == 6) & (replay_tracker['1_tick'] == True), 'replay_id'].tolist()
@@ -82,8 +94,10 @@ class ItemizationClassifier:
         self.X_H = preprocessing.StandardScaler().fit(self.X_H).transform(self.X_H)
         for counter, player in enumerate(target):
             new_y = np.where(y == player, 1, 0)
-
-            result_rm=cross_validate(self.clf, self.X_H, new_y, cv=5,scoring={'precision': 'precision', 'recall': 'recall', 'accuracy': 'accuracy', 'f1': 'f1', 'roc_auc': 'roc_auc', 'eer': make_scorer(calculate_eer)}, return_estimator=True)
+            result_rm = cross_validate(self.clf, self.X_H, new_y, cv = 5,  \
+                        scoring={'precision': 'precision', 'recall': 'recall', 'accuracy': 'accuracy', \
+                        'f1': 'f1', 'roc_auc': 'roc_auc', 'eer': make_scorer(self.__calculate_eer)}, \
+                        return_estimator=True, return_train_score=True)
             result_dict["accuracy"].append(round(result_rm["test_accuracy"].mean()*100,2))
             result_dict["precision"].append(round(result_rm["test_precision"].mean()*100,2))
             result_dict["recall"].append(round(result_rm["test_recall"].mean()*100,2))
