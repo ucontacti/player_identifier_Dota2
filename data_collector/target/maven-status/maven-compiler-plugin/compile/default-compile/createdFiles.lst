@@ -1,7 +1,12 @@
+dota2identifier/stats/Main$ColumnDef.class
 dota2identifier/info/Main.class
+dota2identifier/stats/Main$DefaultResolver.class
+dota2identifier/stats/Main.class
 dota2identifier/item_all/Main.class
 dota2identifier/unit_orders/Main.class
-dota2identifier/click/Main.class
 dota2identifier/cursor_all/Main.class
+dota2identifier/stats/Main$ValueResolver.class
 dota2identifier/item_change/Main.class
+dota2identifier/stats/Main$1.class
+dota2identifier/click/Main.class
 dota2identifier/cursor_change/Main.class

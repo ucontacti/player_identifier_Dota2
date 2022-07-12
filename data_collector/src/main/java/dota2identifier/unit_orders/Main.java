@@ -145,16 +145,10 @@ public class Main {
 
     @OnEntityCreated
     public void onCreated(Entity e) {
-        // if(isHero(e))
-        //     if (0 <= Integer.parseInt(e.getProperty("m_iPlayerID"))  && Integer.parseInt(e.getProperty("m_iPlayerID")) <= 9)
-        // if(e.getDtClass().getDtName().equals("CDOTAPlayer"))
-        // {
-        //         ent_list.add(e);
-        // }
         if (isHero(e)) {
             Integer id = e.getProperty("m_iPlayerID");
             heroHashtbl.put(id, e.getDtClass().getDtName());
-            // ent_list.add(e);
+            ent_list.add(e);
         }     
     }
 
@@ -164,43 +158,61 @@ public class Main {
     public void onMessage(Context ctx, DotaUserMessages.CDOTAUserMsg_SpectatorPlayerUnitOrders message) 
     {
         Entity et = ctx.getProcessor(Entities.class).getByIndex(message.getEntindex()); 
-        
-        if (ent_list.contains(et))
+        if (et.hasProperty("m_nPlayerID") || et.hasProperty("m_iPlayerID"))
         {
             StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
             StringBuilder sb = new StringBuilder();
-            switch (message.getOrderType()) {
-            case 1: // move action
-            case 2: 
+            int player_id;
+            if (et.hasProperty("m_nPlayerID"))
+            {
+                player_id = et.getProperty("m_nPlayerID");
+            }
+            else
+            {
+                player_id = et.getProperty("m_iPlayerID");
+            }
+            if (heroHashtbl.get(player_id) != null)
+            {
                 sb.append(ctx.getTick());
                 sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                sb.append(heroHashtbl.get(player_id));
                 sb.append(',');
-                sb.append('M');
+                sb.append(message.getOrderType());
                 sb.append('\n');
                 action_writer.write(sb.toString());
-                break;
-            case 3: // attack action
-            case 4:
-                sb.append(ctx.getTick());
-                sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                sb.append(',');
-                sb.append('A');
-                sb.append('\n');
-                action_writer.write(sb.toString());
-                break;
-            case 5: // cast spell action
-            case 6:
-                sb.append(ctx.getTick());
-                sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                sb.append(',');
-                sb.append('S');
-                sb.append('\n');
-                action_writer.write(sb.toString());
-                break;
-            }    
+            }
+            // switch (message.getOrderType()) {
+            // case 1: // move action
+            // case 2: 
+            //     sb.append(ctx.getTick());
+            //     sb.append(',');
+            //     sb.append(heroHashtbl.get(player_id));
+            //     sb.append(',');
+            //     sb.append('M');
+            //     sb.append('\n');
+            //     action_writer.write(sb.toString());
+            //     break;
+            // case 3: // attack action
+            // case 4:
+            //     sb.append(ctx.getTick());
+            //     sb.append(',');
+            //     sb.append(heroHashtbl.get(player_id));
+            //     sb.append(',');
+            //     sb.append('A');
+            //     sb.append('\n');
+            //     action_writer.write(sb.toString());
+            //     break;
+            // case 5: // cast spell action
+            // case 6:
+            //     sb.append(ctx.getTick());
+            //     sb.append(',');
+            //     sb.append(heroHashtbl.get(player_id));
+            //     sb.append(',');
+            //     sb.append('S');
+            //     sb.append('\n');
+            //     action_writer.write(sb.toString());
+            //     break;
+            // }    
         }
     //     if (message.hasAbilityId())
     //     {
@@ -230,7 +242,7 @@ public class Main {
 
     public void runControlled(String[] args) throws Exception {
         String rep_pwd = args[0];
-        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order_v2.csv";
+        String output = "features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ds/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order_v3.csv";
         
         action_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
