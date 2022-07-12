@@ -140,6 +140,7 @@ public class Main {
             case "npc_dota_hero_arc_warden": return "CDOTA_Unit_Hero_ArcWarden";
             case "npc_dota_hero_winter_wyvern": return "CDOTA_Unit_Hero_Winter_Wyvern";
             case "npc_dota_hero_marci": return "CDOTA_Unit_Hero_Marci";            
+            case "npc_dota_hero_primal_beast": return "CDOTA_Unit_Hero_PrimalBeast";
             default: return "Unknown";
         }
     }
