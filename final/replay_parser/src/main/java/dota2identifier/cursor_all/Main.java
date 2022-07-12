@@ -165,20 +165,26 @@ public class Main {
         {    
             Entities entities = ctx.getProcessor(Entities.class);
             StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
-            int itemId;
-            
-
+            int itemId; 
             for (Entity et: ent_list)
             {
-
-                if(et.getDtClass().getDtName().equals("CDOTAPlayer"))
+                int player_id;
+                if (et.hasProperty("m_nPlayerID"))
                 {
-                    if(heroHashtbl.containsKey(et.getProperty("m_iPlayerID")))
+                    player_id = et.getProperty("m_nPlayerID");
+                }
+                else
+                {
+                    player_id = et.getProperty("m_iPlayerID");
+                }            
+                if(isPlayer(et))
+                {
+                    if(heroHashtbl.containsKey(player_id))
                     {
                         StringBuilder sb = new StringBuilder();
                         sb.append(tick);
                         sb.append(',');
-                        sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                        sb.append(heroHashtbl.get(player_id));
                         sb.append(',');
                         sb.append(et.getProperty("m_iCursor.0000"));
                         sb.append(',');
@@ -244,6 +250,10 @@ public class Main {
 
         if (ctx != null) {
             Iterator<Entity> playerEntities = getEntities(ctx, "CDOTAPlayer");
+            if (!playerEntities.hasNext())
+            {
+                playerEntities = getEntities(ctx, "CDOTAPlayerController");
+            }
             while(playerEntities.hasNext()) {
                 Entity playerEntity = playerEntities.next();
                 if (isGamePlayer(playerEntity))

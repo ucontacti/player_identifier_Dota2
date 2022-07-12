@@ -92,33 +92,36 @@ public class Main {
     @OnEntityPropertyChanged(classPattern = "CDOTA_Unit_Hero_.*", propertyPattern = "m_hItems.*")
     public void onItemChange(Context ctx, Entity et, FieldPath fp)
     {
-        if (item_updater_tick != ctx.getTick() || !et.getDtClass().getDtName().equals(update_hero_name))
+        if (isHero(et))
         {
-            if (((int) et.getProperty("m_hReplicatingOtherHeroModel") == 16777215)) 
+            if (item_updater_tick != ctx.getTick() || !et.getDtClass().getDtName().equals(update_hero_name))
             {
-                update_hero_name = et.getDtClass().getDtName();
-                item_updater_tick = ctx.getTick();
-                Entities entities = ctx.getProcessor(Entities.class);
-                StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
-                int itemId;
-
-                StringBuilder sb = new StringBuilder();
-                sb.append(item_updater_tick + 1);
-                sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
-                for (int i=0; i<9; i++)
+                if (((int) et.getProperty("m_hReplicatingOtherHeroModel") == 16777215)) 
                 {
-                    String item_slot = String.format("m_hItems.%04d", i);
-                    int item_id = et.getProperty(item_slot);
-                    String item_name = getEntityNameByHandle(item_id, entities, stringTable);
+                    update_hero_name = et.getDtClass().getDtName();
+                    item_updater_tick = ctx.getTick();
+                    Entities entities = ctx.getProcessor(Entities.class);
+                    StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
+                    int itemId;
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(item_updater_tick + 1);
                     sb.append(',');
-                    sb.append(item_name);
-                    // sb.append(item_id);
+                    sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                    for (int i=0; i<9; i++)
+                    {
+                        String item_slot = String.format("m_hItems.%04d", i);
+                        int item_id = et.getProperty(item_slot);
+                        String item_name = getEntityNameByHandle(item_id, entities, stringTable);
+                        sb.append(',');
+                        sb.append(item_name);
+                        // sb.append(item_id);
+                    }
+                    sb.append('\n');
+                    item_updater.write(sb.toString());
                 }
-                sb.append('\n');
-                item_updater.write(sb.toString());
             }
-        }
+        }    
     }
 
 

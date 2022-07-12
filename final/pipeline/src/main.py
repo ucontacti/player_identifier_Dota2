@@ -63,7 +63,7 @@ def itemization(model_num: int =typer.Option(1, prompt="What is the name of the 
         if sure:
             model.save_model()
     else:
-        print("Cannot load ESN!")
+        typer.echo("Cannot load ESN!")
 
 if __name__ == "__main__":
     app()

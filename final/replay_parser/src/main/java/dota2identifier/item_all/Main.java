@@ -105,10 +105,6 @@ public class Main {
 
     @OnEntityCreated
     public void onCreated(Entity e) {
-        if(e.getDtClass().getDtName().equals("CDOTAPlayer"))
-        {
-                ent_list.add(e);
-        }
         if (isHero(e)) {
             Integer id = e.getProperty("m_iPlayerID");
             heroHashtbl.put(id, e.getDtClass().getDtName());

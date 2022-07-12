@@ -6,7 +6,7 @@ JAVA_TARGET_PATH = "../../replay_parser/target"
 def replay_decompress(match_id_list):
     new_val = []
     for match in match_id_list:
-        filename = f"{REPLAY_PATH}{match}.dem.bz2"
+        filename = f"{REPLAY_PATH}/{match}.dem.bz2"
         try:
             output = subprocess.run(['bzip2', '-dk', filename],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,

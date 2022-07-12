@@ -97,6 +97,15 @@ public class Main {
         }
     }
 
+    @OnEntityCreated
+    public void onCreated(Entity e) {
+        if (isHero(e)) {
+            Integer id = e.getProperty("m_iPlayerID");
+            heroHashtbl.put(id, e.getDtClass().getDtName());
+            ent_list.add(e);
+        }     
+    }
+
     public static String getTeamName(int team) {
         switch(team) {
             case 2: return "Radiant";
@@ -146,14 +155,6 @@ public class Main {
     private PrintWriter action_writer;
 
 
-    @OnEntityCreated
-    public void onCreated(Entity e) {
-        if (isHero(e)) {
-            Integer id = e.getProperty("m_iPlayerID");
-            heroHashtbl.put(id, e.getDtClass().getDtName());
-        }     
-    }
-
     /**
      * The most important method that raises everytime there a 
      * unit order message. Depending on the type of unit order
@@ -165,17 +166,25 @@ public class Main {
     public void onMessage(Context ctx, DotaUserMessages.CDOTAUserMsg_SpectatorPlayerUnitOrders message) 
     {
         Entity et = ctx.getProcessor(Entities.class).getByIndex(message.getEntindex()); 
-        
-        if (ent_list.contains(et))
+        if (et.hasProperty("m_nPlayerID") || et.hasProperty("m_iPlayerID"))
         {
             StringTable stringTable = ctx.getProcessor(StringTables.class).forName("EntityNames");
             StringBuilder sb = new StringBuilder();
+            int player_id;
+            if (et.hasProperty("m_nPlayerID"))
+            {
+                player_id = et.getProperty("m_nPlayerID");
+            }
+            else
+            {
+                player_id = et.getProperty("m_iPlayerID");
+            }
             switch (message.getOrderType()) {
             case 1: // move action
             case 2: 
                 sb.append(ctx.getTick());
                 sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                sb.append(heroHashtbl.get(player_id));
                 sb.append(',');
                 sb.append('M');
                 sb.append('\n');
@@ -185,7 +194,7 @@ public class Main {
             case 4:
                 sb.append(ctx.getTick());
                 sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                sb.append(heroHashtbl.get(player_id));
                 sb.append(',');
                 sb.append('A');
                 sb.append('\n');
@@ -195,7 +204,7 @@ public class Main {
             case 6:
                 sb.append(ctx.getTick());
                 sb.append(',');
-                sb.append(heroHashtbl.get(et.getProperty("m_iPlayerID")));
+                sb.append(heroHashtbl.get(player_id));
                 sb.append(',');
                 sb.append('S');
                 sb.append('\n');
@@ -232,7 +241,6 @@ public class Main {
     public void runControlled(String[] args) throws Exception {
         String rep_pwd = args[0];
         String output = "../features/" + rep_pwd.substring(rep_pwd.lastIndexOf("ys/") + 3, rep_pwd.lastIndexOf("s/") + 12) + "_unit_order_v2.csv";
-        
         action_writer = new PrintWriter(new File(output));
         StringBuilder sb = new StringBuilder();
         sb.append("Tick");
@@ -243,15 +251,12 @@ public class Main {
         sb.append('\n');
         action_writer.write(sb.toString());
 
-
         running = true;
-
         long tStart = System.currentTimeMillis();
         ControllableRunner cRunner = new ControllableRunner(new MappedFileSource(args[0])).runWith(this);
         for (int i = 0 ; i < 30000; i++) {
             cRunner.tick();
         }
-
         if (ctx != null) {
             Iterator<Entity> playerEntities = getEntities(ctx, "CDOTAPlayer");
             while(playerEntities.hasNext()) {

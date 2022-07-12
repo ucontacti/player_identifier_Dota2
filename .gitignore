@@ -7,7 +7,11 @@
 /replays
 /replay_downloader
 /dependency-reduced-pom.xml
-final/resources/downloaded_replays/*
-final/resources/trainable_features/*
+final/pipeline/resources/downloaded_replays/*
+final/pipeline/features/*
+final/pipeline/resources/trainable_features/*
+final/pipeline/resources/replay_tracker.csv
+final/pipeline/resources/player_index.txt
+final/pipeline/resources/trainable_features/*
 final/replay_parser/target/*
 final/pipeline/src/util/ESN.py
