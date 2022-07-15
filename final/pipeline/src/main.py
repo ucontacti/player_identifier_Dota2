@@ -28,11 +28,12 @@ def pipeline(fetch_new: bool = False):
         typer.echo("adding new replays to pipline.")
         add_replay_to_pipeline()
     update_pipeline()
+    typer.echo("pipline job finished. Ready to train!")
 
 @app.command()
 def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
-        show_default=True):
-    num_of_players = typer.Option(5, prompt="How many players do you want to classify?")
+                num_of_players: int = typer.Option(5, prompt="How many players do you want to classify?"),\
+                show_default=True):    
     model = MovementClassifier(num_of_players)
     model.select_model(model_num)
     model.train_and_eval()
@@ -48,8 +49,9 @@ def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of 
 
 @app.command()
 def itemization(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
-        show_default=True):
-    model = ItemizationClassifier()
+                num_of_players: int = typer.Option(5, prompt="How many players do you want to classify?"),\
+                show_default=True):
+    model = ItemizationClassifier(num_of_players)
     if  model.found_ESN():
         model.select_model(model_num)
         model.train_and_eval()

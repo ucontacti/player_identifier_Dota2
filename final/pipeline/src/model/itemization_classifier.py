@@ -24,7 +24,8 @@ REPLAY_TRACKER_PATH = "../resources/replay_tracker.csv"
 
 
 class ItemizationClassifier:
-    def __init__(self) -> None:
+    def __init__(self, num_of_players) -> None:
+        self.num_of_players = num_of_players
         if found_ESN:
             self.__create_esn()
 
@@ -32,13 +33,13 @@ class ItemizationClassifier:
         return found_ESN
 
     def select_model(self, model_name: int) -> None:
-        if model_name == "1":
+        if model_name == 1:
             self.clf = LogisticRegression()
             self.model_name = "Logistic Regression"
-        elif model_name == "2":
+        elif model_name == 2:
             self.clf = RandomForestClassifier()
             self.model_name = "Random Forest"
-        elif model_name == "3":
+        elif model_name == 3:
             self.clf = DecisionTreeClassifier()
             self.model_name = "Decision Tree"
         else:

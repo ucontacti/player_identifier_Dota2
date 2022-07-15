@@ -18,16 +18,15 @@ class MovementClassifier:
     def __init__(self, num_of_players) -> None:
         self.num_of_players = num_of_players
         self.__load_movement_data()
-        pass
 
     def select_model(self, model_name: int) -> None:
-        if model_name == "1":
+        if model_name == 1:
             self.clf = LogisticRegression()
             self.model_name = "Logistic Regression"
-        elif model_name == "2":
+        elif model_name == 2:
             self.clf = RandomForestClassifier()
             self.model_name = "Random Forest"
-        elif model_name == "3":
+        elif model_name == 3:
             self.clf = DecisionTreeClassifier()
             self.model_name = "Decision Tree"
         else:
@@ -35,7 +34,7 @@ class MovementClassifier:
         
     def train_and_eval(self) -> None:
         drop_list = ["Label", "Hero", "Steam_id", "Cur_cr_min", "Cur_cr_max", "Cur_cr_mean", "Cur_cr_std"]
-        target = self.data.value_counts()
+        target = self.data["Steam_id"].value_counts()
         result_values = {}
         result_dict = {}
         result_dict["accuracy"] = []
@@ -44,14 +43,14 @@ class MovementClassifier:
         result_dict["f1"] = []
         result_dict["roc"] = []
         result_dict["eer"] = []
-        for counter, player in enumerate(target):
+        for counter, player in enumerate(target.index):
             self.data.loc[self.data["Steam_id"] == player, "Label"] = 1
             self.data.loc[self.data["Steam_id"] != player, "Label"] = 0
             y = self.data["Label"]
             hero_name = self.data.loc[self.data["Steam_id"] == player, "Hero"].iloc[0]
             new_X = self.data.drop(drop_list, axis = 1)
 
-            new_X = self.__preprocess()
+            new_X = preprocessing.StandardScaler().fit(new_X).transform(new_X)
 
             result_rm = cross_validate(self.clf, new_X, y, cv = 10,  \
                         scoring={'precision': 'precision', 'recall': 'recall', 'accuracy': 'accuracy', \
@@ -88,10 +87,7 @@ class MovementClassifier:
         steamer = self.data["Steam_id"].value_counts()
         self.data = self.data[self.data.groupby("Steam_id")["Steam_id"].transform('count').ge(steamer.iloc[self.num_of_players - 1])]
 
-    def __preprocess(self) -> None:
-        self.data = preprocessing.StandardScaler().fit(self.data).transform(self.data)
-
-    def __calculate_eer(y_true, y_score):
+    def __calculate_eer(self, y_true, y_score):
         fpr, tpr, thresholds = roc_curve(y_true, y_score, pos_label=1)
         eer = brentq(lambda x : 1. - x - interp1d(fpr, tpr)(x), 0., 1.)
         return eer

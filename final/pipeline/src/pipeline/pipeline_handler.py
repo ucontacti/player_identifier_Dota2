@@ -138,6 +138,6 @@ def update_pipeline():
     #    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
 
     new_val = atomic_feature(replay_tracker.loc[(replay_tracker['state'] == 7), 'replay_id'].tolist())
-    replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
+    # replay_tracker.loc[(replay_tracker['state'] == 7),'state'] = new_val
     
-    replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
+    # replay_tracker.to_csv(REPLAY_TRACKER_PATH, index=False)
