@@ -15,24 +15,57 @@ from scipy.optimize import brentq #for eer
 from scipy.interpolate import interp1d #for eer
 
 class MovementClassifier:
+    """
+    A class to train mouse movement features using simple Scikit linear models
+
+    ...
+
+    Attributes
+    ----------
+    num_of_players : int
+        Number of target players to classify
+    data : Pandas Dataframe
+        Movement features data
+    clf : Scikit Model
+        Chosen model for training
+    model_name: str
+        String value of the model name
+    estimator: Scikit Estimator
+        Trained estimator
+
+    """
     def __init__(self, num_of_players) -> None:
+        """ 
+        Loads the data and number of target players
+
+        Args:
+            num_of_players (int): Number of top target players to classify,
+            ordered by number of features
+        """
         self.num_of_players = num_of_players
         self.__load_movement_data()
 
-    def select_model(self, model_name: int) -> None:
-        if model_name == 1:
+    def select_model(self, model_number: int) -> None:
+        """ 
+        Args:
+            model_number (int): Given model number in commandline
+        """
+        if model_number == 1:
             self.clf = LogisticRegression()
             self.model_name = "Logistic Regression"
-        elif model_name == 2:
+        elif model_number == 2:
             self.clf = RandomForestClassifier()
             self.model_name = "Random Forest"
-        elif model_name == 3:
+        elif model_number == 3:
             self.clf = DecisionTreeClassifier()
             self.model_name = "Decision Tree"
         else:
             pass
         
     def train_and_eval(self) -> None:
+        """ 
+        Trains loaded data based on the selected number of players
+        """
         drop_list = ["Label", "Hero", "Steam_id", "Cur_cr_min", "Cur_cr_max", "Cur_cr_mean", "Cur_cr_std"]
         target = self.data["Steam_id"].value_counts()
         result_values = {}
@@ -77,6 +110,9 @@ class MovementClassifier:
 
 
     def __load_movement_data(self) -> None:
+        """ 
+        Internal data loaded method
+        """
         tmp_df_holder = []
         for file in glob("../resources/trainable_features/combo/*.csv"):
             df = pd.read_csv(file, index_col=None, header=0)

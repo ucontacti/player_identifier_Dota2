@@ -14,6 +14,9 @@ app = typer.Typer()
 
 @app.command()
 def player_id_scrapper(driver_path: str = typer.Option(..., "--driver_path", "-d"), num_player: int = typer.Option(10, "--num_player", "-n", show_default=True)):
+    """
+    Command to scrape dotabuff for players that have played a hero a bunch
+    """
     if not exists(driver_path):
         typer.echo("chromedriver not found!")
     else:
@@ -22,6 +25,10 @@ def player_id_scrapper(driver_path: str = typer.Option(..., "--driver_path", "-d
 
 @app.command()
 def pipeline(fetch_new: bool = False):
+    """
+    Update the pipeline either by adding new players to the pool or
+    updating the pipeline for the existing players
+    """
     if not exists(REPLAY_TRACKER_PATH):
         create_empty_replay_tracker()
     if fetch_new:
@@ -33,7 +40,10 @@ def pipeline(fetch_new: bool = False):
 @app.command()
 def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
                 num_of_players: int = typer.Option(5, prompt="How many players do you want to classify?"),\
-                show_default=True):    
+                show_default=True):
+    """
+    Train a linear model for mouse movement features
+    """
     model = MovementClassifier(num_of_players)
     model.select_model(model_num)
     model.train_and_eval()
@@ -51,6 +61,9 @@ def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of 
 def itemization(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
                 num_of_players: int = typer.Option(5, prompt="How many players do you want to classify?"),\
                 show_default=True):
+    """
+    Train a linear model for itemization features
+    """
     model = ItemizationClassifier(num_of_players)
     if  model.found_ESN():
         model.select_model(model_num)
