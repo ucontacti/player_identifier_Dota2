@@ -1,4 +1,4 @@
-![Actions Status](https://github.com/ucontacti/player_identifier_Dota2/workflows/CI/badge.svg)(https://github.com/ucontacti/player_identifier_Dota2/actions)
+![Actions Status](https://github.com/ucontacti/player_identifier_Dota2/workflows/CI/badge.svg)
 
 # player_identifier_Dota2
 Player authentication in Dota 2 based on Keystroke and Mouse Movement
