@@ -38,7 +38,7 @@ def pipeline(fetch_new: bool = False):
     typer.echo("pipline job finished. Ready to train!")
 
 @app.command()
-def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
+def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\n4) Shallow Neural Network\n5) LSTM\n6) GRU\nYour choice"),\
                 num_of_players: int = typer.Option(5, prompt="How many players do you want to classify?"),\
                 show_default=True):
     """
@@ -58,7 +58,7 @@ def mouse_movement(model_num: int = typer.Option(1, prompt="What is the name of 
         model.save_model()    
 
 @app.command()
-def itemization(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\nYour choice"),\
+def itemization(model_num: int =typer.Option(1, prompt="What is the name of the model?\n1) Logistic Regression\n2) Random Forest\n3) Decision Tree\n4) Shallow Neural Network\n5) LSTM\n6) GRU\nYour choice"),\
                 num_of_players: int = typer.Option(5, prompt="How many players do you want to classify?"),\
                 show_default=True):
     """
