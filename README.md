@@ -5,6 +5,7 @@ Player authentication in Dota 2 based on Keystroke and Mouse Movement
 Work in progress ...
 
 ## Running
+You can see final/
 Using Python(Make sure you are using python 3.8 or above):
     ```
     pip install -r requirements.txt  
