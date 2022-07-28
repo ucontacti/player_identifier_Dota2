@@ -88,8 +88,9 @@ class ItemizationClassifier(BaseClassifier):
             for item in dfs_item:
                 steam_id = df_match_info.loc[df_match_info["Hero"] == item["Hero"].iloc[0]].iloc[0]["SteamId"]
                 hero_name = df_match_info.loc[df_match_info["Hero"] == item["Hero"].iloc[0]].iloc[0]["Hero"]
-                temp_item = item[["Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9"]].values.tolist()
-                input.append(temp_item)
+                temp_item = item[["Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9"]].values.astype(int)
+                input.append(np.apply_along_axis(self.one_hot, 1, temp_item))
+                # input.append(temp_item)
                 self.steam_id_list.append(steam_id)
         self.steam_id_list = np.array(self.steam_id_list)
         X_TSObjs=[ESNTimeSeries(Xi) for Xi in input]
@@ -116,6 +117,7 @@ class ItemizationClassifier(BaseClassifier):
         result_dict["eer"] = []
         
         steamer = pd.DataFrame(self.steam_id_list).value_counts()
+        # print(steamer[:self.num_of_players])
         self.trainable_features = np.delete(self.trainable_features, np.where(~np.isin(self.steam_id_list, steamer[:self.num_of_players].index.to_list())), axis = 0)
         y = np.delete(self.steam_id_list, np.where(~np.isin(self.steam_id_list, steamer[:self.num_of_players].index.to_list())))
         self.trainable_features = preprocessing.StandardScaler().fit(self.trainable_features).transform(self.trainable_features)
@@ -144,6 +146,12 @@ class ItemizationClassifier(BaseClassifier):
         print(f"eer: {(sum(result_dict['eer']) / len(result_dict['eer']))}")
         
         # return result_dict, result_values
+
+
+    def one_hot(self, row):
+        tmp_mask = np.zeros(len(self.loaded_dict) + 1)
+        tmp_mask[row] = 1
+        return tmp_mask
 
     
     def nn_train_and_eval(self) -> None:
