@@ -2,9 +2,10 @@
 
 # player_identifier_Dota2
 Player authentication in Dota 2 based on Keystroke and Mouse Movement
+Work in progress ...
 
 ## Running
-* Using Python(Make sure you are using python 3.8 or above):
+Using Python(Make sure you are using python 3.8 or above):
     ```
     pip install -r requirements.txt  
     python app.py  
@@ -21,10 +22,10 @@ Scrape new players from Dotabuff
 #### Pipeline
 Update the pipeline by either adding new players to the pool or updating the existing ones
 #### mouse_movement
-Train a linear model using mouse movement data
+Train a linear model or neural network using mouse movement data
 #### itemization
-Train a linear model for itemization features
-### Results
+Train a linear model or neural network for itemization features
+<!-- ### Results -->
 <!-- The results of the authentication was over 90% and the detail report can be found [here](https://drive.google.com/open?id=1-332uLhMxQbwe6LelzNJXikF9g-gDSV-) -->
 
 ## Author
