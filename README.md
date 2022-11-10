@@ -21,13 +21,16 @@ We got over 90% F1-Score for binary classification of two accounts in both case 
 ![](plots/itemization_result.jpg)
 *Scenario B is different heroes while Scenario A is for Same Hero*
 
-## Running
-You can see final/<br/>
-Using Python(Make sure you are using python 3.8 or above):
+The slide presentation of the thesis can be found [here](https://docs.google.com/presentation/d/e/2PACX-1vTwmbJLj7aA6J4Znnq4ZEU0JWX4UEH0OK2mbF9RxO7MkT7D3uyDj0dWG6FCB7gxSMcL21Dxz72zWhWT/pub?start=false&loop=false&delayms=3000)
+
+<!-- ## Running
+<p>You can see final/<p>
+<p>Using Python(Make sure you are using python 3.8 or above):</p>
+
     ```
     pip install -r requirements.txt  
-    python app.py  
-    ```
+    python app.py
+    ``` -->
 
 ## Author
 * **Saleh Daghigh** - [ucontacti](https://github.com/ucontacti)
